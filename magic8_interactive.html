@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic 8 Ball Interactive Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.75;
+            color: #222;
+            background: #faf8f3;
+            padding: 80px 60px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 80px;
+            padding-bottom: 40px;
+            border-bottom: 3px solid #222;
+        }
+
+        h1 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #666;
+            font-weight: 400;
+        }
+
+        section {
+            margin-bottom: 100px;
+        }
+
+        h2 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #222;
+        }
+
+        .tools-intro {
+            color: #555;
+            margin-bottom: 35px;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .tool {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 40px;
+        }
+
+        .tool-title {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        .tool-description {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f3f0;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        select, input[type="range"] {
+            font-family: Georgia, serif;
+            font-size: 1em;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        .slider-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            padding: 0;
+        }
+
+        .slider-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            min-width: 50px;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: #fefdfb;
+            border-left: 4px solid #8b6f47;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .result-content {
+            color: #333;
+            line-height: 1.8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            background: #f0f0f0;
+            font-weight: 600;
+            border-bottom: 2px solid #222;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0ddd8;
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .chart {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f5f3f0;
+        }
+
+        .bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .bar-label {
+            width: 120px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .bar-fill {
+            flex: 1;
+            height: 24px;
+            background: #ccc;
+            margin: 0 12px;
+            position: relative;
+        }
+
+        .bar-value {
+            width: 60px;
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+
+        .significant {
+            color: #c00;
+            font-weight: 600;
+        }
+
+        .not-significant {
+            color: #666;
+        }
+
+        footer {
+            margin-top: 120px;
+            padding-top: 40px;
+            border-top: 2px solid #222;
+            font-size: 0.9em;
+            color: #777;
+            line-height: 1.8;
+        }
+
+        .footnote {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Magic 8 Ball Interactive Analysis</h1>
+            <p class="subtitle">Explore patterns across 12 personas, 8 questions, 96 readings.</p>
+        </header>
+
+        <section>
+            <h2>Interactive Tools</h2>
+            <p class="tools-intro">
+                Use these tools to discover relationships, patterns, and significance in the oracle data.
+                Each tool reveals something different about how personas make decisions.
+            </p>
+
+            <div class="tools-grid">
+                <!-- TOOL 1: PERSONA COMPARISON -->
+                <div class="tool">
+                    <div class="tool-title">Persona Comparison</div>
+                    <p class="tool-description">
+                        Compare response preferences between two personas. See where they diverge, where they agree,
+                        and whether differences are statistically significant.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Select First Persona</label>
+                            <select id="comp-p1">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Select Second Persona</label>
+                            <select id="comp-p2">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="comp-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 2: QUESTION SENSITIVITY -->
+                <div class="tool">
+                    <div class="tool-title">Question Drill-Down</div>
+                    <p class="tool-description">
+                        Pick a question to see which personas diverged most in their responses.
+                        See response distribution for that specific question.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Select Question</label>
+                            <select id="qs-question">
+                                <option value="Is this the right approach?">Is this the right approach?</option>
+<option value="Is this worth the effort?">Is this worth the effort?</option>
+<option value="Should we commit to this?">Should we commit to this?</option>
+<option value="Should we deploy this immediately?">Should we deploy this immediately?</option>
+<option value="Should we move forward?">Should we move forward?</option>
+<option value="Should we take this chance?">Should we take this chance?</option>
+<option value="This needs more thought.">This needs more thought.</option>
+<option value="This seems too risky.">This seems too risky.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="qs-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 3: RESPONSE BIAS EXPLORER -->
+                <div class="tool">
+                    <div class="tool-title">Response Bias Explorer</div>
+                    <p class="tool-description">
+                        Select a response to see which personas choose it, with what confidence,
+                        and on which questions.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Select Response</label>
+                            <select id="rbe-response">
+                                <option value="Needs more discussion">Needs more discussion</option>
+<option value="No, fundamentally wrong">No, fundamentally wrong</option>
+<option value="No, not yet">No, not yet</option>
+<option value="Probably not">Probably not</option>
+<option value="Probably yes">Probably yes</option>
+<option value="Revisit later">Revisit later</option>
+<option value="Uncertain">Uncertain</option>
+<option value="Yes, absolutely">Yes, absolutely</option>
+<option value="Yes, but proceed cautiously">Yes, but proceed cautiously</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="rbe-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 4: CONFIDENCE SLIDER -->
+                <div class="tool">
+                    <div class="tool-title">Confidence Threshold</div>
+                    <p class="tool-description">
+                        Filter all readings by confidence level. See how readings change as you raise the threshold.
+                        High threshold = only confident decisions. Low threshold = includes ambiguous ones.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Minimum Confidence</label>
+                            <div class="slider-container">
+                                <input type="range" id="conf-slider" min="0" max="100" value="0" step="5">
+                                <span class="slider-value" id="conf-display">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result" id="conf-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 5: PERSONA NEIGHBORHOOD -->
+                <div class="tool">
+                    <div class="tool-title">Persona Neighborhood</div>
+                    <p class="tool-description">
+                        See which personas think most like a selected persona. Distance is based on
+                        response preference vectors.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Select Persona</label>
+                            <select id="pn-persona">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="pn-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 6: RESPONSE TRAJECTORY -->
+                <div class="tool">
+                    <div class="tool-title">Confidence Trajectory</div>
+                    <p class="tool-description">
+                        For a selected persona, see how their confidence changed across the 8 questions.
+                        Did they get more certain? Stay scattered? Show consistent patterns?
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Select Persona</label>
+                            <select id="rt-persona">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="rt-result" style="display:none;"></div>
+                </div>
+
+                <!-- TOOL 7: SIGNIFICANCE TESTING -->
+                <div class="tool">
+                    <div class="tool-title">Statistical Significance</div>
+                    <p class="tool-description">
+                        Compare two personas statistically. Shows t-statistic, p-value, and Cohen's d
+                        (effect size). p &lt; 0.05 = significantly different.
+                    </p>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>First Persona</label>
+                            <select id="sig-p1">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Second Persona</label>
+                            <select id="sig-p2">
+                                <option value="alice">alice</option>
+<option value="frankenstein">frankenstein</option>
+<option value="gatsby">gatsby</option>
+<option value="jane">jane</option>
+<option value="marcus">marcus</option>
+<option value="marx">marx</option>
+<option value="moby">moby</option>
+<option value="persuasion">persuasion</option>
+<option value="quixote">quixote</option>
+<option value="velveteen">velveteen</option>
+<option value="waste_land">waste_land</option>
+<option value="woolf">woolf</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="result" id="sig-result" style="display:none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footnote">
+                <strong>Methodology:</strong> Comparisons use euclidean distance and t-tests.
+                Significance threshold: p &lt; 0.05. Effect size (Cohen's d): &lt;0.2 = small, 0.2–0.8 = medium, &gt;0.8 = large.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Embedded data
+        const DATA = [{"persona": "velveteen", "question": "Should we deploy this immediately?", "response": "Uncertain", "similarity": 0.5479522943496704, "alternatives": ["Yes, absolutely", "Yes, but proceed cautiously"]}, {"persona": "velveteen", "question": "This seems too risky.", "response": "Uncertain", "similarity": 0.3366226553916931, "alternatives": ["No, not yet", "Yes, but proceed cautiously"]}, {"persona": "velveteen", "question": "Should we take this chance?", "response": "Probably not", "similarity": 0.18381111323833466, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "velveteen", "question": "Is this the right approach?", "response": "No, not yet", "similarity": 0.052438315004110336, "alternatives": ["Probably not", "Probably yes"]}, {"persona": "velveteen", "question": "Should we move forward?", "response": "Revisit later", "similarity": -0.008102145977318287, "alternatives": ["No, not yet", "Yes, absolutely"]}, {"persona": "velveteen", "question": "This needs more thought.", "response": "Uncertain", "similarity": 0.40440836548805237, "alternatives": ["Yes, absolutely", "Revisit later"]}, {"persona": "velveteen", "question": "Should we commit to this?", "response": "Probably not", "similarity": 0.4532671570777893, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "velveteen", "question": "Is this worth the effort?", "response": "Uncertain", "similarity": 0.7329687476158142, "alternatives": ["Yes, absolutely", "No, not yet"]}, {"persona": "frankenstein", "question": "Should we deploy this immediately?", "response": "Probably yes", "similarity": 0.6600710153579712, "alternatives": ["Probably not", "No, not yet"]}, {"persona": "frankenstein", "question": "This seems too risky.", "response": "Probably not", "similarity": 0.6084222793579102, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "frankenstein", "question": "Should we take this chance?", "response": "Probably not", "similarity": 0.651868999004364, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "frankenstein", "question": "Is this the right approach?", "response": "Probably not", "similarity": 0.3777061104774475, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "frankenstein", "question": "Should we move forward?", "response": "Probably not", "similarity": 0.6319699287414551, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "frankenstein", "question": "This needs more thought.", "response": "Probably not", "similarity": 0.48700836300849915, "alternatives": ["Probably yes", "Yes, absolutely"]}, {"persona": "frankenstein", "question": "Should we commit to this?", "response": "Probably not", "similarity": 0.5918141007423401, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "frankenstein", "question": "Is this worth the effort?", "response": "Probably not", "similarity": 0.4915989339351654, "alternatives": ["Yes, absolutely", "Probably yes"]}, {"persona": "jane", "question": "Should we deploy this immediately?", "response": "No, not yet", "similarity": 0.30417919158935547, "alternatives": ["Probably not", "Probably yes"]}, {"persona": "jane", "question": "This seems too risky.", "response": "Yes, but proceed cautiously", "similarity": 0.3056160807609558, "alternatives": ["No, not yet", "Probably not"]}, {"persona": "jane", "question": "Should we take this chance?", "response": "Probably yes", "similarity": 0.3338705897331238, "alternatives": ["Uncertain", "Probably not"]}, {"persona": "jane", "question": "Is this the right approach?", "response": "Yes, but proceed cautiously", "similarity": 0.3655957877635956, "alternatives": ["Probably yes", "Uncertain"]}, {"persona": "jane", "question": "Should we move forward?", "response": "Uncertain", "similarity": 0.3140139579772949, "alternatives": ["Probably yes", "Probably not"]}, {"persona": "jane", "question": "This needs more thought.", "response": "Revisit later", "similarity": 0.26305755972862244, "alternatives": ["Yes, but proceed cautiously", "Yes, absolutely"]}, {"persona": "jane", "question": "Should we commit to this?", "response": "Probably not", "similarity": 0.4212875962257385, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "jane", "question": "Is this worth the effort?", "response": "Revisit later", "similarity": 0.3517969250679016, "alternatives": ["Yes, but proceed cautiously", "No, not yet"]}, {"persona": "quixote", "question": "Should we deploy this immediately?", "response": "Probably not", "similarity": 0.2898736894130707, "alternatives": ["Revisit later", "No, not yet"]}, {"persona": "quixote", "question": "This seems too risky.", "response": "Yes, absolutely", "similarity": 0.3993906080722809, "alternatives": ["No, fundamentally wrong", "Probably yes"]}, {"persona": "quixote", "question": "Should we take this chance?", "response": "Revisit later", "similarity": 0.13734222948551178, "alternatives": ["No, fundamentally wrong", "Probably not"]}, {"persona": "quixote", "question": "Is this the right approach?", "response": "Yes, absolutely", "similarity": 0.3267230689525604, "alternatives": ["Probably yes", "No, fundamentally wrong"]}, {"persona": "quixote", "question": "Should we move forward?", "response": "Revisit later", "similarity": 0.04100996255874634, "alternatives": ["Probably not", "No, fundamentally wrong"]}, {"persona": "quixote", "question": "This needs more thought.", "response": "Probably not", "similarity": 0.22192198038101196, "alternatives": ["No, fundamentally wrong", "Probably yes"]}, {"persona": "quixote", "question": "Should we commit to this?", "response": "No, fundamentally wrong", "similarity": 0.303923100233078, "alternatives": ["Yes, absolutely", "Probably not"]}, {"persona": "quixote", "question": "Is this worth the effort?", "response": "Probably yes", "similarity": 0.5036545991897583, "alternatives": ["Revisit later", "Yes, absolutely"]}, {"persona": "waste_land", "question": "Should we deploy this immediately?", "response": "Yes, but proceed cautiously", "similarity": 0.49214768409729004, "alternatives": ["Probably yes", "Needs more discussion"]}, {"persona": "waste_land", "question": "This seems too risky.", "response": "Needs more discussion", "similarity": 0.5086653828620911, "alternatives": ["Revisit later", "Probably yes"]}, {"persona": "waste_land", "question": "Should we take this chance?", "response": "Revisit later", "similarity": 0.3295353353023529, "alternatives": ["Probably not", "No, fundamentally wrong"]}, {"persona": "waste_land", "question": "Is this the right approach?", "response": "Needs more discussion", "similarity": 0.5278818011283875, "alternatives": ["No, fundamentally wrong", "Yes, absolutely"]}, {"persona": "waste_land", "question": "Should we move forward?", "response": "Revisit later", "similarity": 0.3218116760253906, "alternatives": ["Probably not", "No, fundamentally wrong"]}, {"persona": "waste_land", "question": "This needs more thought.", "response": "Revisit later", "similarity": 0.49380648136138916, "alternatives": ["No, fundamentally wrong", "Needs more discussion"]}, {"persona": "waste_land", "question": "Should we commit to this?", "response": "Revisit later", "similarity": 0.2587297856807709, "alternatives": ["Probably not", "Needs more discussion"]}, {"persona": "waste_land", "question": "Is this worth the effort?", "response": "Needs more discussion", "similarity": 0.5294367074966431, "alternatives": ["Probably yes", "Yes, absolutely"]}, {"persona": "woolf", "question": "Should we deploy this immediately?", "response": "Yes, absolutely", "similarity": 0.3587200343608856, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "woolf", "question": "This seems too risky.", "response": "No, fundamentally wrong", "similarity": 0.03185049444437027, "alternatives": ["Too risky", "Yes, absolutely"]}, {"persona": "woolf", "question": "Should we take this chance?", "response": "No, fundamentally wrong", "similarity": 0.2397385984659195, "alternatives": ["Yes, absolutely", "Needs more discussion"]}, {"persona": "woolf", "question": "Is this the right approach?", "response": "No, fundamentally wrong", "similarity": 0.058045826852321625, "alternatives": ["Revisit later", "Yes, absolutely"]}, {"persona": "woolf", "question": "Should we move forward?", "response": "No, fundamentally wrong", "similarity": 0.3184201121330261, "alternatives": ["Needs more discussion", "Revisit later"]}, {"persona": "woolf", "question": "This needs more thought.", "response": "No, not yet", "similarity": 0.025800257921218872, "alternatives": ["Revisit later", "Probably not"]}, {"persona": "woolf", "question": "Should we commit to this?", "response": "No, fundamentally wrong", "similarity": 0.5813072323799133, "alternatives": ["Yes, absolutely", "Probably not"]}, {"persona": "woolf", "question": "Is this worth the effort?", "response": "No, not yet", "similarity": 0.30867263674736023, "alternatives": ["Revisit later", "Uncertain"]}, {"persona": "gatsby", "question": "Should we deploy this immediately?", "response": "Probably not", "similarity": 0.24392597377300262, "alternatives": ["Yes, but proceed cautiously", "Probably yes"]}, {"persona": "gatsby", "question": "This seems too risky.", "response": "Probably not", "similarity": 0.49056845903396606, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "gatsby", "question": "Should we take this chance?", "response": "Probably not", "similarity": 0.4975126385688782, "alternatives": ["Probably yes", "Yes, but proceed cautiously"]}, {"persona": "gatsby", "question": "Is this the right approach?", "response": "Probably yes", "similarity": 0.5083638429641724, "alternatives": ["Probably not", "No, not yet"]}, {"persona": "gatsby", "question": "Should we move forward?", "response": "Probably not", "similarity": 0.4131806194782257, "alternatives": ["Probably yes", "Yes, but proceed cautiously"]}, {"persona": "gatsby", "question": "This needs more thought.", "response": "Probably not", "similarity": 0.5062563419342041, "alternatives": ["Probably yes", "Yes, but proceed cautiously"]}, {"persona": "gatsby", "question": "Should we commit to this?", "response": "Probably not", "similarity": 0.5684694051742554, "alternatives": ["Probably yes", "Yes, but proceed cautiously"]}, {"persona": "gatsby", "question": "Is this worth the effort?", "response": "Probably not", "similarity": 0.3667236566543579, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "marcus", "question": "Should we deploy this immediately?", "response": "Probably not", "similarity": 0.2940117120742798, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "marcus", "question": "This seems too risky.", "response": "Yes, but proceed cautiously", "similarity": 0.4758386015892029, "alternatives": ["Yes, absolutely", "Probably yes"]}, {"persona": "marcus", "question": "Should we take this chance?", "response": "Probably not", "similarity": 0.2403712421655655, "alternatives": ["No, fundamentally wrong", "Yes, but proceed cautiously"]}, {"persona": "marcus", "question": "Is this the right approach?", "response": "Probably not", "similarity": 0.315324068069458, "alternatives": ["Yes, but proceed cautiously", "Probably yes"]}, {"persona": "marcus", "question": "Should we move forward?", "response": "Probably not", "similarity": 0.2352375090122223, "alternatives": ["Yes, but proceed cautiously", "No, not yet"]}, {"persona": "marcus", "question": "This needs more thought.", "response": "No, not yet", "similarity": 0.27695232629776, "alternatives": ["Revisit later", "Probably yes"]}, {"persona": "marcus", "question": "Should we commit to this?", "response": "Probably not", "similarity": 0.22799909114837646, "alternatives": ["No, fundamentally wrong", "Yes, but proceed cautiously"]}, {"persona": "marcus", "question": "Is this worth the effort?", "response": "Yes, but proceed cautiously", "similarity": 0.31827685236930847, "alternatives": ["Probably not", "Probably yes"]}, {"persona": "marx", "question": "Should we deploy this immediately?", "response": "Needs more discussion", "similarity": 0.35966625809669495, "alternatives": ["Revisit later", "Probably not"]}, {"persona": "marx", "question": "This seems too risky.", "response": "Needs more discussion", "similarity": 0.49906274676322937, "alternatives": ["No, not yet", "Probably not"]}, {"persona": "marx", "question": "Should we take this chance?", "response": "Probably not", "similarity": 0.0394374281167984, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "marx", "question": "Is this the right approach?", "response": "Needs more discussion", "similarity": 0.3738788068294525, "alternatives": ["Yes, but proceed cautiously", "No, fundamentally wrong"]}, {"persona": "marx", "question": "Should we move forward?", "response": "Needs more discussion", "similarity": 0.1450202614068985, "alternatives": ["Too risky", "Probably not"]}, {"persona": "marx", "question": "This needs more thought.", "response": "Needs more discussion", "similarity": 0.6430245041847229, "alternatives": ["No, fundamentally wrong", "No, not yet"]}, {"persona": "marx", "question": "Should we commit to this?", "response": "No, not yet", "similarity": -0.052329760044813156, "alternatives": ["Probably not", "Too risky"]}, {"persona": "marx", "question": "Is this worth the effort?", "response": "No, not yet", "similarity": 0.43814682960510254, "alternatives": ["Probably not", "No, fundamentally wrong"]}, {"persona": "alice", "question": "Should we deploy this immediately?", "response": "No, not yet", "similarity": 0.5550709962844849, "alternatives": ["Yes, absolutely", "Probably yes"]}, {"persona": "alice", "question": "This seems too risky.", "response": "Yes, absolutely", "similarity": 0.3624982535839081, "alternatives": ["No, fundamentally wrong", "Probably yes"]}, {"persona": "alice", "question": "Should we take this chance?", "response": "Yes, absolutely", "similarity": 0.5388504266738892, "alternatives": ["No, fundamentally wrong", "Probably yes"]}, {"persona": "alice", "question": "Is this the right approach?", "response": "Yes, absolutely", "similarity": 0.1757160723209381, "alternatives": ["No, fundamentally wrong", "Probably yes"]}, {"persona": "alice", "question": "Should we move forward?", "response": "Yes, absolutely", "similarity": 0.47821977734565735, "alternatives": ["Probably yes", "No, fundamentally wrong"]}, {"persona": "alice", "question": "This needs more thought.", "response": "Probably yes", "similarity": 0.5826046466827393, "alternatives": ["Probably not", "Yes, absolutely"]}, {"persona": "alice", "question": "Should we commit to this?", "response": "Yes, absolutely", "similarity": 0.5090277791023254, "alternatives": ["Probably yes", "No, not yet"]}, {"persona": "alice", "question": "Is this worth the effort?", "response": "Yes, absolutely", "similarity": 0.2821456789970398, "alternatives": ["Probably yes", "No, fundamentally wrong"]}, {"persona": "persuasion", "question": "Should we deploy this immediately?", "response": "No, not yet", "similarity": 0.6382915377616882, "alternatives": ["Too risky", "Probably yes"]}, {"persona": "persuasion", "question": "This seems too risky.", "response": "Yes, absolutely", "similarity": 0.5571511387825012, "alternatives": ["Uncertain", "Probably yes"]}, {"persona": "persuasion", "question": "Should we take this chance?", "response": "Yes, absolutely", "similarity": 0.717278778553009, "alternatives": ["No, not yet", "Probably yes"]}, {"persona": "persuasion", "question": "Is this the right approach?", "response": "Yes, absolutely", "similarity": 0.6830553412437439, "alternatives": ["Probably yes", "Probably not"]}, {"persona": "persuasion", "question": "Should we move forward?", "response": "No, not yet", "similarity": 0.6709585785865784, "alternatives": ["Probably yes", "Yes, absolutely"]}, {"persona": "persuasion", "question": "This needs more thought.", "response": "Yes, absolutely", "similarity": 0.6703321933746338, "alternatives": ["Uncertain", "No, not yet"]}, {"persona": "persuasion", "question": "Should we commit to this?", "response": "No, not yet", "similarity": 0.6788595914840698, "alternatives": ["Too risky", "Probably yes"]}, {"persona": "persuasion", "question": "Is this worth the effort?", "response": "No, not yet", "similarity": 0.6690971851348877, "alternatives": ["Probably yes", "Yes, but proceed cautiously"]}, {"persona": "moby", "question": "Should we deploy this immediately?", "response": "No, fundamentally wrong", "similarity": 0.32510408759117126, "alternatives": ["Uncertain", "Too risky"]}, {"persona": "moby", "question": "This seems too risky.", "response": "No, fundamentally wrong", "similarity": 0.4274646043777466, "alternatives": ["Uncertain", "Yes, but proceed cautiously"]}, {"persona": "moby", "question": "Should we take this chance?", "response": "No, fundamentally wrong", "similarity": 0.5209138989448547, "alternatives": ["Yes, absolutely", "Uncertain"]}, {"persona": "moby", "question": "Is this the right approach?", "response": "No, fundamentally wrong", "similarity": 0.5342487692832947, "alternatives": ["Yes, absolutely", "Needs more discussion"]}, {"persona": "moby", "question": "Should we move forward?", "response": "No, fundamentally wrong", "similarity": 0.6525043845176697, "alternatives": ["Yes, absolutely", "Probably not"]}, {"persona": "moby", "question": "This needs more thought.", "response": "Yes, absolutely", "similarity": 0.3721572756767273, "alternatives": ["Needs more discussion", "No, not yet"]}, {"persona": "moby", "question": "Should we commit to this?", "response": "No, fundamentally wrong", "similarity": 0.4540722966194153, "alternatives": ["Yes, absolutely", "Probably not"]}, {"persona": "moby", "question": "Is this worth the effort?", "response": "No, fundamentally wrong", "similarity": 0.4659898579120636, "alternatives": ["Uncertain", "Yes, absolutely"]}];
+        const PERSONAS = ["alice", "frankenstein", "gatsby", "jane", "marcus", "marx", "moby", "persuasion", "quixote", "velveteen", "waste_land", "woolf"];
+        const RESPONSES = ["Needs more discussion", "No, fundamentally wrong", "No, not yet", "Probably not", "Probably yes", "Revisit later", "Uncertain", "Yes, absolutely", "Yes, but proceed cautiously"];
+        const QUESTIONS = ["Is this the right approach?", "Is this worth the effort?", "Should we commit to this?", "Should we deploy this immediately?", "Should we move forward?", "Should we take this chance?", "This needs more thought.", "This seems too risky."];
+        const PERSONA_RESPONSE_STATS = {"alice": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.5550709962844849, "std": 0.0, "count": 1}, "Probably not": {"mean": 0, "std": 0, "count": 0}, "Probably yes": {"mean": 0.5826046466827393, "std": 0.0, "count": 1}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0.39107633133729297, "std": 0.1306434984831956, "count": 6}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "frankenstein": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0, "std": 0, "count": 0}, "Probably not": {"mean": 0.5486269593238831, "std": 0.09204700852793675, "count": 7}, "Probably yes": {"mean": 0.6600710153579712, "std": 0.0, "count": 1}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "gatsby": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0, "std": 0, "count": 0}, "Probably not": {"mean": 0.44094815637384144, "std": 0.10091481271670541, "count": 7}, "Probably yes": {"mean": 0.5083638429641724, "std": 0.0, "count": 1}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "jane": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.30417919158935547, "std": 0.0, "count": 1}, "Probably not": {"mean": 0.4212875962257385, "std": 0.0, "count": 1}, "Probably yes": {"mean": 0.3338705897331238, "std": 0.0, "count": 1}, "Revisit later": {"mean": 0.307427242398262, "std": 0.04436968266963959, "count": 2}, "Uncertain": {"mean": 0.3140139579772949, "std": 0.0, "count": 1}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0.3356059342622757, "std": 0.029989853501319885, "count": 2}}, "marcus": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.27695232629776, "std": 0.0, "count": 1}, "Probably not": {"mean": 0.2625887244939804, "std": 0.03523228307907855, "count": 5}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0.3970577269792557, "std": 0.0787808746099472, "count": 2}}, "marx": {"Needs more discussion": {"mean": 0.40413051545619966, "std": 0.16499262177589544, "count": 5}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.1929085347801447, "std": 0.24523829482495785, "count": 2}, "Probably not": {"mean": 0.0394374281167984, "std": 0.0, "count": 1}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "moby": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0.48289969989231657, "std": 0.09406458443556551, "count": 7}, "No, not yet": {"mean": 0, "std": 0, "count": 0}, "Probably not": {"mean": 0, "std": 0, "count": 0}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0.3721572756767273, "std": 0.0, "count": 1}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "persuasion": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.664301723241806, "std": 0.015457776799385365, "count": 4}, "Probably not": {"mean": 0, "std": 0, "count": 0}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0.656954362988472, "std": 0.060124757976297336, "count": 4}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "quixote": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0.303923100233078, "std": 0.0, "count": 1}, "No, not yet": {"mean": 0, "std": 0, "count": 0}, "Probably not": {"mean": 0.2558978348970413, "std": 0.03397585451602936, "count": 2}, "Probably yes": {"mean": 0.5036545991897583, "std": 0.0, "count": 1}, "Revisit later": {"mean": 0.08917609602212906, "std": 0.04816613346338272, "count": 2}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0.36305683851242065, "std": 0.03633376955986023, "count": 2}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "velveteen": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0.052438315004110336, "std": 0.0, "count": 1}, "Probably not": {"mean": 0.318539135158062, "std": 0.13472802191972733, "count": 2}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": -0.008102145977318287, "std": 0.0, "count": 1}, "Uncertain": {"mean": 0.5054880157113075, "std": 0.1518908357614239, "count": 4}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}, "waste_land": {"Needs more discussion": {"mean": 0.5219946304957072, "std": 0.009446553703589697, "count": 3}, "No, fundamentally wrong": {"mean": 0, "std": 0, "count": 0}, "No, not yet": {"mean": 0, "std": 0, "count": 0}, "Probably not": {"mean": 0, "std": 0, "count": 0}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0.3509708195924759, "std": 0.08691974782864609, "count": 4}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0, "std": 0, "count": 0}, "Yes, but proceed cautiously": {"mean": 0.49214768409729004, "std": 0.0, "count": 1}}, "woolf": {"Needs more discussion": {"mean": 0, "std": 0, "count": 0}, "No, fundamentally wrong": {"mean": 0.24587245285511017, "std": 0.19945000299262247, "count": 5}, "No, not yet": {"mean": 0.16723644733428955, "std": 0.14143618941307068, "count": 2}, "Probably not": {"mean": 0, "std": 0, "count": 0}, "Probably yes": {"mean": 0, "std": 0, "count": 0}, "Revisit later": {"mean": 0, "std": 0, "count": 0}, "Uncertain": {"mean": 0, "std": 0, "count": 0}, "Yes, absolutely": {"mean": 0.3587200343608856, "std": 0.0, "count": 1}, "Yes, but proceed cautiously": {"mean": 0, "std": 0, "count": 0}}};
+        const PERSONA_DISTANCES = {"alice|frankenstein": 0.8763772513142861, "alice|gatsby": 0.8130138260784716, "alice|jane": 0.872345621127837, "alice|marcus": 0.892371303129504, "alice|marx": 0.8879230282241809, "alice|moby": 0.9386597019557977, "alice|persuasion": 0.6496542570957644, "alice|quixote": 0.6934892513626902, "alice|velveteen": 1.0497901899827855, "alice|waste_land": 1.1993085239499035, "alice|woolf": 0.742525423620454, "frankenstein|gatsby": 0.18603706824306732, "frankenstein|jane": 0.7217303027816191, "frankenstein|marcus": 0.8671038269411476, "frankenstein|marx": 0.9463101501730337, "frankenstein|moby": 1.0527955375132845, "frankenstein|persuasion": 1.2686887326544265, "frankenstein|quixote": 0.5850541261133712, "frankenstein|velveteen": 0.8642729359541047, "frankenstein|waste_land": 1.1724135529951718, "frankenstein|woolf": 0.9766200086290115, "gatsby|jane": 0.6550626168006131, "gatsby|marcus": 0.72429504579935, "gatsby|marx": 0.7875149763990007, "gatsby|moby": 0.9080540905904253, "gatsby|persuasion": 1.1514142990229075, "gatsby|quixote": 0.5161372815475176, "gatsby|velveteen": 0.7292128091208834, "gatsby|waste_land": 1.0443837067270254, "gatsby|woolf": 0.8185172135542718, "jane|marcus": 0.5781771378847319, "jane|marx": 0.8594936721398463, "jane|moby": 1.0290376894452373, "jane|persuasion": 1.075164034257557, "jane|quixote": 0.7948298901479012, "jane|velveteen": 0.658978557094446, "jane|waste_land": 0.8825884163332031, "jane|woolf": 0.8958722392376033, "marcus|marx": 0.6146837984234659, "marcus|moby": 0.8215859211441385, "marcus|persuasion": 0.899019614439982, "marcus|quixote": 0.848647186899206, "marcus|velveteen": 0.6832097826230026, "marcus|waste_land": 0.7418601213770627, "marcus|woolf": 0.6540478399986495, "marx|moby": 0.7574850790910647, "marx|persuasion": 0.9048079119000904, "marx|quixote": 0.8562652242442453, "marx|velveteen": 0.7187036230862908, "marx|waste_land": 0.6465684977705582, "marx|woolf": 0.5955410703369267, "moby|persuasion": 0.8692515634724944, "moby|quixote": 0.599349209120945, "moby|velveteen": 0.8552741632366327, "moby|waste_land": 1.0047693324486486, "moby|woolf": 0.29039714979526166, "persuasion|quixote": 0.9732141688971689, "persuasion|velveteen": 1.0784325777786374, "persuasion|waste_land": 1.2291273603600694, "persuasion|woolf": 0.6296593256340693, "quixote|velveteen": 0.865738051551412, "quixote|waste_land": 1.0613931366623108, "quixote|woolf": 0.5987159160570078, "velveteen|waste_land": 1.0016767060120915, "velveteen|woolf": 0.7479056736887343, "waste_land|woolf": 0.9246456666615315};
+        const PERSONA_NEIGHBORS = {"alice": [["persuasion", 0.6496542570957644], ["quixote", 0.6934892513626902], ["woolf", 0.742525423620454]], "frankenstein": [["gatsby", 0.18603706824306732], ["quixote", 0.5850541261133712], ["jane", 0.7217303027816191]], "gatsby": [["frankenstein", 0.18603706824306732], ["quixote", 0.5161372815475176], ["jane", 0.6550626168006131]], "jane": [["marcus", 0.5781771378847319], ["gatsby", 0.6550626168006131], ["velveteen", 0.658978557094446]], "marcus": [["jane", 0.5781771378847319], ["marx", 0.6146837984234659], ["woolf", 0.6540478399986495]], "marx": [["woolf", 0.5955410703369267], ["marcus", 0.6146837984234659], ["waste_land", 0.6465684977705582]], "moby": [["woolf", 0.29039714979526166], ["quixote", 0.599349209120945], ["marx", 0.7574850790910647]], "persuasion": [["woolf", 0.6296593256340693], ["alice", 0.6496542570957644], ["moby", 0.8692515634724944]], "quixote": [["gatsby", 0.5161372815475176], ["frankenstein", 0.5850541261133712], ["woolf", 0.5987159160570078]], "velveteen": [["jane", 0.658978557094446], ["marcus", 0.6832097826230026], ["marx", 0.7187036230862908]], "waste_land": [["marx", 0.6465684977705582], ["marcus", 0.7418601213770627], ["jane", 0.8825884163332031]], "woolf": [["moby", 0.29039714979526166], ["marx", 0.5955410703369267], ["quixote", 0.5987159160570078]]};
+        const SIGNIFICANCE_TESTS = {"alice|frankenstein": {"t_statistic": -2.025213160418581, "p_value": 0.06234948354957944, "cohens_d": -1.0126065802092905, "mean1": 0.43551670387387276, "mean2": 0.5625574663281441}, "alice|gatsby": {"t_statistic": -0.2184161939809302, "p_value": 0.8302566288308846, "cohens_d": -0.1092080969904651, "mean1": 0.43551670387387276, "mean2": 0.4493751171976328}, "alice|jane": {"t_statistic": 1.8921664798038698, "p_value": 0.07933405064111325, "cohens_d": 0.9460832399019351, "mean1": 0.43551670387387276, "mean2": 0.3324272111058235}, "alice|marcus": {"t_statistic": 2.32954166315462, "p_value": 0.03531252557872891, "cohens_d": 1.16477083157731, "mean1": 0.43551670387387276, "mean2": 0.2980014253407717}, "alice|marx": {"t_statistic": 1.3079084766071354, "p_value": 0.21197375810666158, "cohens_d": 0.6539542383035677, "mean1": 0.43551670387387276, "mean2": 0.30573838436976075}, "alice|moby": {"t_statistic": -0.5316811559398549, "p_value": 0.6032817520534519, "cohens_d": -0.26584057796992744, "mean1": 0.43551670387387276, "mean2": 0.4690568968653679}, "alice|persuasion": {"t_statistic": -4.138280366647987, "p_value": 0.001004246793000417, "cohens_d": -2.0691401833239933, "mean1": 0.43551670387387276, "mean2": 0.660628043115139}, "alice|quixote": {"t_statistic": 2.1591371028395416, "p_value": 0.04868093861429373, "cohens_d": 1.0795685514197708, "mean1": 0.43551670387387276, "mean2": 0.2779799047857523}, "alice|velveteen": {"t_statistic": 0.9483591919938901, "p_value": 0.35903060865037606, "cohens_d": 0.4741795959969449, "mean1": 0.43551670387387276, "mean2": 0.33792081277351826}, "alice|waste_land": {"t_statistic": 0.04269472932960883, "p_value": 0.9665478311429025, "cohens_d": 0.021347364664804414, "mean1": 0.43551670387387276, "mean2": 0.4327518567442894}, "alice|woolf": {"t_statistic": 2.2703579339709905, "p_value": 0.039506074261689304, "cohens_d": 1.135178966985495, "mean1": 0.43551670387387276, "mean2": 0.24031939916312695}, "frankenstein|gatsby": {"t_statistic": 2.2209149872888063, "p_value": 0.043364256305349215, "cohens_d": 1.110457493644403, "mean1": 0.5625574663281441, "mean2": 0.4493751171976328}, "frankenstein|jane": {"t_statistic": 5.8650289827376625, "p_value": 4.110087548164981e-05, "cohens_d": 2.9325144913688312, "mean1": 0.5625574663281441, "mean2": 0.3324272111058235}, "frankenstein|marcus": {"t_statistic": 5.834610584867963, "p_value": 4.333503972630034e-05, "cohens_d": 2.9173052924339813, "mean1": 0.5625574663281441, "mean2": 0.2980014253407717}, "frankenstein|marx": {"t_statistic": 2.7992865785410603, "p_value": 0.014200247504679615, "cohens_d": 1.3996432892705302, "mean1": 0.5625574663281441, "mean2": 0.30573838436976075}, "frankenstein|moby": {"t_statistic": 1.851303356152082, "p_value": 0.08533374083321821, "cohens_d": 0.925651678076041, "mean1": 0.5625574663281441, "mean2": 0.4690568968653679}, "frankenstein|persuasion": {"t_statistic": -2.5069372597258877, "p_value": 0.02512753615621804, "cohens_d": -1.2534686298629438, "mean1": 0.5625574663281441, "mean2": 0.660628043115139}, "frankenstein|quixote": {"t_statistic": 4.559894403256642, "p_value": 0.0004452131615505976, "cohens_d": 2.279947201628321, "mean1": 0.5625574663281441, "mean2": 0.2779799047857523}, "frankenstein|velveteen": {"t_statistic": 2.3468760199368917, "p_value": 0.034166232832033364, "cohens_d": 1.1734380099684456, "mean1": 0.5625574663281441, "mean2": 0.33792081277351826}, "frankenstein|waste_land": {"t_statistic": 2.4685965736810513, "p_value": 0.027057442418348558, "cohens_d": 1.2342982868405257, "mean1": 0.5625574663281441, "mean2": 0.4327518567442894}, "frankenstein|woolf": {"t_statistic": 4.172881452252339, "p_value": 0.0009387848444734048, "cohens_d": 2.0864407261261695, "mean1": 0.5625574663281441, "mean2": 0.24031939916312695}, "gatsby|jane": {"t_statistic": 2.896271919455578, "p_value": 0.011728130287651106, "cohens_d": 1.448135959727789, "mean1": 0.4493751171976328, "mean2": 0.3324272111058235}, "gatsby|marcus": {"t_statistic": 3.2670459990275686, "p_value": 0.005618881030491818, "cohens_d": 1.6335229995137843, "mean1": 0.4493751171976328, "mean2": 0.2980014253407717}, "gatsby|marx": {"t_statistic": 1.5572358890689308, "p_value": 0.14172688416619264, "cohens_d": 0.7786179445344654, "mean1": 0.4493751171976328, "mean2": 0.30573838436976075}, "gatsby|moby": {"t_statistic": -0.3829379144349254, "p_value": 0.7075172001101007, "cohens_d": -0.1914689572174627, "mean1": 0.4493751171976328, "mean2": 0.4690568968653679}, "gatsby|persuasion": {"t_statistic": -5.246682726813656, "p_value": 0.00012359182063599692, "cohens_d": -2.623341363406828, "mean1": 0.4493751171976328, "mean2": 0.660628043115139}, "gatsby|quixote": {"t_statistic": 2.714850995415451, "p_value": 0.016761809081423634, "cohens_d": 1.3574254977077258, "mean1": 0.4493751171976328, "mean2": 0.2779799047857523}, "gatsby|velveteen": {"t_statistic": 1.1586806494312305, "p_value": 0.26596946220769435, "cohens_d": 0.5793403247156151, "mean1": 0.4493751171976328, "mean2": 0.33792081277351826}, "gatsby|waste_land": {"t_statistic": 0.31106614829805757, "p_value": 0.7603337648407466, "cohens_d": 0.15553307414902878, "mean1": 0.4493751171976328, "mean2": 0.4327518567442894}, "gatsby|woolf": {"t_statistic": 2.6868166110084495, "p_value": 0.017707794886807845, "cohens_d": 1.3434083055042245, "mean1": 0.4493751171976328, "mean2": 0.24031939916312695}, "jane|marcus": {"t_statistic": 1.043080263685122, "p_value": 0.31458904131021975, "cohens_d": 0.521540131842561, "mean1": 0.3324272111058235, "mean2": 0.2980014253407717}, "jane|marx": {"t_statistic": 0.3092008661648259, "p_value": 0.7617225487475056, "cohens_d": 0.15460043308241292, "mean1": 0.3324272111058235, "mean2": 0.30573838436976075}, "jane|moby": {"t_statistic": -3.432843662552797, "p_value": 0.004040156494258264, "cohens_d": -1.7164218312763986, "mean1": 0.3324272111058235, "mean2": 0.4690568968653679}, "jane|persuasion": {"t_statistic": -13.823849696893827, "p_value": 1.4916429406142076e-09, "cohens_d": -6.911924848446914, "mean1": 0.3324272111058235, "mean2": 0.660628043115139}, "jane|quixote": {"t_statistic": 1.0061850765278926, "p_value": 0.331401446009451, "cohens_d": 0.5030925382639464, "mean1": 0.3324272111058235, "mean2": 0.2779799047857523}, "jane|velveteen": {"t_statistic": -0.06068474481811932, "p_value": 0.9524680767398702, "cohens_d": -0.03034237240905966, "mean1": 0.3324272111058235, "mean2": 0.33792081277351826}, "jane|waste_land": {"t_statistic": -2.3658167767604357, "p_value": 0.03295403713471611, "cohens_d": -1.1829083883802178, "mean1": 0.3324272111058235, "mean2": 0.4327518567442894}, "jane|woolf": {"t_statistic": 1.303051233140777, "p_value": 0.2135822064037138, "cohens_d": 0.6515256165703884, "mean1": 0.3324272111058235, "mean2": 0.24031939916312695}, "marcus|marx": {"t_statistic": -0.08668235376298358, "p_value": 0.9321515793686518, "cohens_d": -0.04334117688149179, "mean1": 0.2980014253407717, "mean2": 0.30573838436976075}, "marcus|moby": {"t_statistic": -3.7323396202202477, "p_value": 0.002229931760777819, "cohens_d": -1.8661698101101238, "mean1": 0.2980014253407717, "mean2": 0.4690568968653679}, "marcus|persuasion": {"t_statistic": -11.034306390256825, "p_value": 2.7244120368384774e-08, "cohens_d": -5.5171531951284125, "mean1": 0.2980014253407717, "mean2": 0.660628043115139}, "marcus|quixote": {"t_statistic": 0.34113986888056036, "p_value": 0.7380640182000564, "cohens_d": 0.1705699344402802, "mean1": 0.2980014253407717, "mean2": 0.2779799047857523}, "marcus|velveteen": {"t_statistic": -0.42769897285881486, "p_value": 0.675376030606622, "cohens_d": -0.21384948642940738, "mean1": 0.2980014253407717, "mean2": 0.33792081277351826}, "marcus|waste_land": {"t_statistic": -2.8008585881878316, "p_value": 0.014156379123036682, "cohens_d": -1.4004292940939158, "mean1": 0.2980014253407717, "mean2": 0.4327518567442894}, "marcus|woolf": {"t_statistic": 0.7768741040285092, "p_value": 0.45016074545027995, "cohens_d": 0.38843705201425455, "mean1": 0.2980014253407717, "mean2": 0.24031939916312695}, "marx|moby": {"t_statistic": -1.7754582111298758, "p_value": 0.09755538086319346, "cohens_d": -0.8877291055649379, "mean1": 0.30573838436976075, "mean2": 0.4690568968653679}, "marx|persuasion": {"t_statistic": -4.114094599293562, "p_value": 0.0010527612604958553, "cohens_d": -2.057047299646781, "mean1": 0.30573838436976075, "mean2": 0.660628043115139}, "marx|quixote": {"t_statistic": 0.28032252173661015, "p_value": 0.7833296939188866, "cohens_d": 0.14016126086830508, "mean1": 0.30573838436976075, "mean2": 0.2779799047857523}, "marx|velveteen": {"t_statistic": -0.2621350797740299, "p_value": 0.7970349291474047, "cohens_d": -0.13106753988701492, "mean1": 0.30573838436976075, "mean2": 0.33792081277351826}, "marx|waste_land": {"t_statistic": -1.3636319624738724, "p_value": 0.1942092636358739, "cohens_d": -0.6818159812369361, "mean1": 0.30573838436976075, "mean2": 0.4327518567442894}, "marx|woolf": {"t_statistic": 0.600351097677047, "p_value": 0.5578661415928697, "cohens_d": 0.3001755488385235, "mean1": 0.30573838436976075, "mean2": 0.24031939916312695}, "moby|persuasion": {"t_statistic": -4.827368865754933, "p_value": 0.0002684106342632939, "cohens_d": -2.4136844328774667, "mean1": 0.4690568968653679, "mean2": 0.660628043115139}, "moby|quixote": {"t_statistic": 3.0443569013294534, "p_value": 0.008747198471966939, "cohens_d": 1.5221784506647267, "mean1": 0.4690568968653679, "mean2": 0.2779799047857523}, "moby|velveteen": {"t_statistic": 1.3667200242848905, "p_value": 0.19326127532425738, "cohens_d": 0.6833600121424451, "mean1": 0.4690568968653679, "mean2": 0.33792081277351826}, "moby|waste_land": {"t_statistic": 0.6849462476524301, "p_value": 0.5045608073449148, "cohens_d": 0.34247312382621503, "mean1": 0.4690568968653679, "mean2": 0.4327518567442894}, "moby|woolf": {"t_statistic": 2.9510876693788277, "p_value": 0.010523211877190464, "cohens_d": 1.4755438346894139, "mean1": 0.4690568968653679, "mean2": 0.24031939916312695}, "persuasion|quixote": {"t_statistic": 7.082522751386024, "p_value": 5.485506251729978e-06, "cohens_d": 3.541261375693012, "mean1": 0.660628043115139, "mean2": 0.2779799047857523}, "persuasion|velveteen": {"t_statistic": 3.5667793609081846, "p_value": 0.003096036852678871, "cohens_d": 1.7833896804540923, "mean1": 0.660628043115139, "mean2": 0.33792081277351826}, "persuasion|waste_land": {"t_statistic": 5.38755894219872, "p_value": 9.57349999385002e-05, "cohens_d": 2.69377947109936, "mean1": 0.660628043115139, "mean2": 0.4327518567442894}, "persuasion|woolf": {"t_statistic": 5.951626037864213, "p_value": 3.537625732006798e-05, "cohens_d": 2.9758130189321057, "mean1": 0.660628043115139, "mean2": 0.24031939916312695}, "quixote|velveteen": {"t_statistic": -0.5835650144169431, "p_value": 0.5687960010125386, "cohens_d": -0.29178250720847154, "mean1": 0.2779799047857523, "mean2": 0.33792081277351826}, "quixote|waste_land": {"t_statistic": -2.4015071894553115, "p_value": 0.03077994285696141, "cohens_d": -1.2007535947276557, "mean1": 0.2779799047857523, "mean2": 0.4327518567442894}, "quixote|woolf": {"t_statistic": 0.43922702671489977, "p_value": 0.6672003857604287, "cohens_d": 0.21961351335744989, "mean1": 0.2779799047857523, "mean2": 0.24031939916312695}, "velveteen|waste_land": {"t_statistic": -0.9770443773971809, "p_value": 0.34512913267119505, "cohens_d": -0.4885221886985904, "mean1": 0.33792081277351826, "mean2": 0.4327518567442894}, "velveteen|woolf": {"t_statistic": 0.8688561873153996, "p_value": 0.39957622699321804, "cohens_d": 0.4344280936576998, "mean1": 0.33792081277351826, "mean2": 0.24031939916312695}, "waste_land|woolf": {"t_statistic": 2.439590681281339, "p_value": 0.0286108492678754, "cohens_d": 1.2197953406406692, "mean1": 0.4327518567442894, "mean2": 0.24031939916312695}};
+        const PERSONA_QUESTION_CONFIDENCE = {"alice": {"Is this the right approach?": 0.1757160723209381, "Is this worth the effort?": 0.2821456789970398, "Should we commit to this?": 0.5090277791023254, "Should we deploy this immediately?": 0.5550709962844849, "Should we move forward?": 0.47821977734565735, "Should we take this chance?": 0.5388504266738892, "This needs more thought.": 0.5826046466827393, "This seems too risky.": 0.3624982535839081}, "frankenstein": {"Is this the right approach?": 0.3777061104774475, "Is this worth the effort?": 0.4915989339351654, "Should we commit to this?": 0.5918141007423401, "Should we deploy this immediately?": 0.6600710153579712, "Should we move forward?": 0.6319699287414551, "Should we take this chance?": 0.651868999004364, "This needs more thought.": 0.48700836300849915, "This seems too risky.": 0.6084222793579102}, "gatsby": {"Is this the right approach?": 0.5083638429641724, "Is this worth the effort?": 0.3667236566543579, "Should we commit to this?": 0.5684694051742554, "Should we deploy this immediately?": 0.24392597377300262, "Should we move forward?": 0.4131806194782257, "Should we take this chance?": 0.4975126385688782, "This needs more thought.": 0.5062563419342041, "This seems too risky.": 0.49056845903396606}, "jane": {"Is this the right approach?": 0.3655957877635956, "Is this worth the effort?": 0.3517969250679016, "Should we commit to this?": 0.4212875962257385, "Should we deploy this immediately?": 0.30417919158935547, "Should we move forward?": 0.3140139579772949, "Should we take this chance?": 0.3338705897331238, "This needs more thought.": 0.26305755972862244, "This seems too risky.": 0.3056160807609558}, "marcus": {"Is this the right approach?": 0.315324068069458, "Is this worth the effort?": 0.31827685236930847, "Should we commit to this?": 0.22799909114837646, "Should we deploy this immediately?": 0.2940117120742798, "Should we move forward?": 0.2352375090122223, "Should we take this chance?": 0.2403712421655655, "This needs more thought.": 0.27695232629776, "This seems too risky.": 0.4758386015892029}, "marx": {"Is this the right approach?": 0.3738788068294525, "Is this worth the effort?": 0.43814682960510254, "Should we commit to this?": -0.052329760044813156, "Should we deploy this immediately?": 0.35966625809669495, "Should we move forward?": 0.1450202614068985, "Should we take this chance?": 0.0394374281167984, "This needs more thought.": 0.6430245041847229, "This seems too risky.": 0.49906274676322937}, "moby": {"Is this the right approach?": 0.5342487692832947, "Is this worth the effort?": 0.4659898579120636, "Should we commit to this?": 0.4540722966194153, "Should we deploy this immediately?": 0.32510408759117126, "Should we move forward?": 0.6525043845176697, "Should we take this chance?": 0.5209138989448547, "This needs more thought.": 0.3721572756767273, "This seems too risky.": 0.4274646043777466}, "persuasion": {"Is this the right approach?": 0.6830553412437439, "Is this worth the effort?": 0.6690971851348877, "Should we commit to this?": 0.6788595914840698, "Should we deploy this immediately?": 0.6382915377616882, "Should we move forward?": 0.6709585785865784, "Should we take this chance?": 0.717278778553009, "This needs more thought.": 0.6703321933746338, "This seems too risky.": 0.5571511387825012}, "quixote": {"Is this the right approach?": 0.3267230689525604, "Is this worth the effort?": 0.5036545991897583, "Should we commit to this?": 0.303923100233078, "Should we deploy this immediately?": 0.2898736894130707, "Should we move forward?": 0.04100996255874634, "Should we take this chance?": 0.13734222948551178, "This needs more thought.": 0.22192198038101196, "This seems too risky.": 0.3993906080722809}, "velveteen": {"Is this the right approach?": 0.052438315004110336, "Is this worth the effort?": 0.7329687476158142, "Should we commit to this?": 0.4532671570777893, "Should we deploy this immediately?": 0.5479522943496704, "Should we move forward?": -0.008102145977318287, "Should we take this chance?": 0.18381111323833466, "This needs more thought.": 0.40440836548805237, "This seems too risky.": 0.3366226553916931}, "waste_land": {"Is this the right approach?": 0.5278818011283875, "Is this worth the effort?": 0.5294367074966431, "Should we commit to this?": 0.2587297856807709, "Should we deploy this immediately?": 0.49214768409729004, "Should we move forward?": 0.3218116760253906, "Should we take this chance?": 0.3295353353023529, "This needs more thought.": 0.49380648136138916, "This seems too risky.": 0.5086653828620911}, "woolf": {"Is this the right approach?": 0.058045826852321625, "Is this worth the effort?": 0.30867263674736023, "Should we commit to this?": 0.5813072323799133, "Should we deploy this immediately?": 0.3587200343608856, "Should we move forward?": 0.3184201121330261, "Should we take this chance?": 0.2397385984659195, "This needs more thought.": 0.025800257921218872, "This seems too risky.": 0.03185049444437027}};
+
+        // Helper: group data
+        function groupBy(arr, key) {
+            const result = {};
+            arr.forEach(item => {
+                const k = item[key];
+                if (!result[k]) result[k] = [];
+                result[k].push(item);
+            });
+            return result;
+        }
+
+        // TOOL 1: PERSONA COMPARISON
+        document.getElementById('comp-p1').addEventListener('change', updateComparison);
+        document.getElementById('comp-p2').addEventListener('change', updateComparison);
+
+        function updateComparison() {
+            const p1 = document.getElementById('comp-p1').value;
+            const p2 = document.getElementById('comp-p2').value;
+            if (!p1 || !p2 || p1 === p2) return;
+
+            const result = document.getElementById('comp-result');
+            let html = '<div class="result-title">Comparison: ' + p1 + ' vs ' + p2 + '</div>';
+            html += '<div class="result-content">';
+
+            // Build comparison table
+            html += '<table><tr><th>Response</th><th class="numeric">' + p1 + '</th><th class="numeric">' + p2 + '</th><th class="numeric">Diff</th></tr>';
+            
+            RESPONSES.forEach(resp => {
+                const s1 = PERSONA_RESPONSE_STATS[p1][resp];
+                const s2 = PERSONA_RESPONSE_STATS[p2][resp];
+                const diff = Math.abs(s1.mean - s2.mean);
+                const row = '<tr><td>' + resp + '</td><td class="numeric">' + s1.mean.toFixed(3) + ' (' + s1.count + ')</td>' +
+                    '<td class="numeric">' + s2.mean.toFixed(3) + ' (' + s2.count + ')</td><td class="numeric">' + diff.toFixed(3) + '</td></tr>';
+                html += row;
+            });
+
+            html += '</table>';
+
+            // Significance
+            const key = [p1, p2].sort().join('|');
+            const sig = SIGNIFICANCE_TESTS[key];
+            if (sig) {
+                const pClass = sig.p_value < 0.05 ? 'significant' : 'not-significant';
+                html += '<p style="margin-top: 20px;"><strong>Statistical Test:</strong></p>';
+                html += '<p>t-statistic: ' + sig.t_statistic.toFixed(3) + '</p>';
+                html += '<p class="' + pClass + '">p-value: ' + sig.p_value.toFixed(4) + ' (' + 
+                    (sig.p_value < 0.05 ? 'SIGNIFICANT' : 'not significant') + ')</p>';
+                html += '<p>Cohen's d: ' + sig.cohens_d.toFixed(3) + ' (effect size)</p>';
+            }
+
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 2: QUESTION SENSITIVITY
+        document.getElementById('qs-question').addEventListener('change', updateQuestionSensitivity);
+
+        function updateQuestionSensitivity() {
+            const question = document.getElementById('qs-question').value;
+            if (!question) return;
+
+            const result = document.getElementById('qs-result');
+            let html = '<div class="result-title">Question: ' + question + '</div>';
+            html += '<div class="result-content">';
+
+            // Get responses for this question
+            const qData = DATA.filter(r => r.question === question);
+            const grouped = groupBy(qData, 'persona');
+
+            // Create table
+            html += '<table><tr><th>Persona</th><th class="numeric">Response</th><th class="numeric">Confidence</th></tr>';
+            
+            Object.keys(grouped).sort().forEach(persona => {
+                const readings = grouped[persona];
+                const avg = readings.reduce((s, r) => s + r.similarity, 0) / readings.length;
+                const resp = readings[0].response;
+                html += '<tr><td>' + persona + '</td><td>' + resp + '</td><td class="numeric">' + avg.toFixed(3) + '</td></tr>';
+            });
+
+            html += '</table>';
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 3: RESPONSE BIAS EXPLORER
+        document.getElementById('rbe-response').addEventListener('change', updateResponseBias);
+
+        function updateResponseBias() {
+            const response = document.getElementById('rbe-response').value;
+            if (!response) return;
+
+            const result = document.getElementById('rbe-result');
+            let html = '<div class="result-title">Who chooses: ' + response + '</div>';
+            html += '<div class="result-content">';
+
+            const rData = DATA.filter(r => r.response === response);
+            const grouped = groupBy(rData, 'persona');
+
+            html += '<table><tr><th>Persona</th><th class="numeric">Count</th><th class="numeric">Mean Confidence</th><th>Questions</th></tr>';
+            
+            Object.keys(grouped).sort().forEach(persona => {
+                const readings = grouped[persona];
+                const count = readings.length;
+                const mean = readings.reduce((s, r) => s + r.similarity, 0) / count;
+                const questions = readings.map(r => r.question.substring(0, 15) + '...').join(', ');
+                html += '<tr><td>' + persona + '</td><td class="numeric">' + count + '</td><td class="numeric">' + 
+                    mean.toFixed(3) + '</td><td style="font-size: 0.85em;">' + questions + '</td></tr>';
+            });
+
+            html += '</table>';
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 4: CONFIDENCE SLIDER
+        document.getElementById('conf-slider').addEventListener('input', updateConfidenceFilter);
+
+        function updateConfidenceFilter() {
+            const threshold = parseFloat(document.getElementById('conf-slider').value) / 100;
+            document.getElementById('conf-display').textContent = threshold.toFixed(2);
+
+            const result = document.getElementById('conf-result');
+            const filtered = DATA.filter(r => r.similarity >= threshold);
+
+            let html = '<div class="result-title">Readings above ' + threshold.toFixed(2) + ' confidence</div>';
+            html += '<div class="result-content">';
+            html += '<p><strong>' + filtered.length + ' of 96</strong> readings (' + (filtered.length * 100 / 96).toFixed(1) + '%)</p>';
+
+            // Show distribution by response
+            const byResponse = groupBy(filtered, 'response');
+            html += '<div class="chart">';
+            Object.keys(byResponse).sort((a, b) => byResponse[b].length - byResponse[a].length).forEach(resp => {
+                const count = byResponse[resp].length;
+                const pct = count * 100 / filtered.length;
+                html += '<div class="bar">';
+                html += '<div class="bar-label">' + resp.substring(0, 20) + '...</div>';
+                html += '<div class="bar-fill" style="width: ' + pct + '%; background: #ccc;"></div>';
+                html += '<div class="bar-value">' + count + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 5: PERSONA NEIGHBORHOOD
+        document.getElementById('pn-persona').addEventListener('change', updatePersonaNeighborhood);
+
+        function updatePersonaNeighborhood() {
+            const persona = document.getElementById('pn-persona').value;
+            if (!persona) return;
+
+            const result = document.getElementById('pn-result');
+            let html = '<div class="result-title">Personas similar to ' + persona + '</div>';
+            html += '<div class="result-content">';
+
+            const neighbors = PERSONA_NEIGHBORS[persona];
+            html += '<table><tr><th>Rank</th><th>Persona</th><th class="numeric">Distance</th></tr>';
+            
+            neighbors.forEach((n, i) => {
+                html += '<tr><td>' + (i + 1) + '</td><td>' + n[0] + '</td><td class="numeric">' + n[1].toFixed(3) + '</td></tr>';
+            });
+
+            html += '</table>';
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 6: RESPONSE TRAJECTORY
+        document.getElementById('rt-persona').addEventListener('change', updateTrajectory);
+
+        function updateTrajectory() {
+            const persona = document.getElementById('rt-persona').value;
+            if (!persona) return;
+
+            const result = document.getElementById('rt-result');
+            let html = '<div class="result-title">Confidence trajectory: ' + persona + '</div>';
+            html += '<div class="result-content">';
+
+            const traj = PERSONA_QUESTION_CONFIDENCE[persona];
+            html += '<div class="chart">';
+            
+            QUESTIONS.forEach(q => {
+                const conf = traj[q];
+                const pct = conf * 100;
+                html += '<div class="bar">';
+                html += '<div class="bar-label" style="width: 180px; font-size: 0.8em;">' + q.substring(0, 25) + '...</div>';
+                html += '<div class="bar-fill" style="width: ' + pct + '%; background: #8b6f47;"></div>';
+                html += '<div class="bar-value">' + conf.toFixed(3) + '</div>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // TOOL 7: SIGNIFICANCE TESTING
+        document.getElementById('sig-p1').addEventListener('change', updateSignificance);
+        document.getElementById('sig-p2').addEventListener('change', updateSignificance);
+
+        function updateSignificance() {
+            const p1 = document.getElementById('sig-p1').value;
+            const p2 = document.getElementById('sig-p2').value;
+            if (!p1 || !p2 || p1 === p2) return;
+
+            const result = document.getElementById('sig-result');
+            let html = '<div class="result-title">Significance: ' + p1 + ' vs ' + p2 + '</div>';
+            html += '<div class="result-content">';
+
+            const key = [p1, p2].sort().join('|');
+            const sig = SIGNIFICANCE_TESTS[key];
+
+            if (sig) {
+                const isSignificant = sig.p_value < 0.05;
+                const dClass = isSignificant ? 'significant' : 'not-significant';
+                
+                html += '<p><strong>t-statistic:</strong> ' + sig.t_statistic.toFixed(4) + '</p>';
+                html += '<p><strong>p-value:</strong> <span class="' + dClass + '">' + sig.p_value.toFixed(4) + '</span></p>';
+                html += '<p><strong>Cohen's d:</strong> ' + sig.cohens_d.toFixed(3);
+                if (Math.abs(sig.cohens_d) > 0.8) html += ' (large effect)';
+                else if (Math.abs(sig.cohens_d) > 0.2) html += ' (medium effect)';
+                else html += ' (small effect)';
+                html += '</p>';
+
+                html += '<p style="margin-top: 20px;"><strong>Interpretation:</strong> ';
+                if (isSignificant) {
+                    html += p1 + ' and ' + p2 + ' are <span class="significant">significantly different</span> in overall confidence (p &lt; 0.05).';
+                } else {
+                    html += p1 + ' and ' + p2 + ' are <span class="not-significant">not significantly different</span> in overall confidence (p ≥ 0.05).';
+                }
+                html += '</p>';
+            } else {
+                html += '<p>No statistical test available.</p>';
+            }
+
+            html += '</div>';
+            result.innerHTML = html;
+            result.style.display = 'block';
+        }
+
+        // Initialize first selects
+        document.getElementById('comp-p1').dispatchEvent(new Event('change'));
+        document.getElementById('qs-question').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
