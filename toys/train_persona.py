@@ -58,6 +58,7 @@ def train_persona(text_path: str, persona_name: str, output_dir: str = "toys_mod
     print("\nSTEP 3: Training predictor (24D → 24D)")
     print("-" * 70)
     predictor_trainer = PredictorTrainer(latent_dim=24)
+    print(f"🧠 Using device: {predictor_trainer.device.upper()}")
     predictor_trainer.fit(latent_chunks, epochs=100, batch_size=2, patience=15)
     predictor_path = output_dir / f"predictor_{persona_name}.pt"
     predictor_trainer.save(str(predictor_path))

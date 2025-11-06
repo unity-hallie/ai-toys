@@ -59,10 +59,20 @@ class PredictorTrainer:
         self,
         latent_dim: int = 24,
         learning_rate: float = 0.001,
-        device: str = "cpu",
+        device: str = None,
     ):
         self.latent_dim = latent_dim
         self.learning_rate = learning_rate
+
+        # Auto-detect best device
+        if device is None:
+            if torch.backends.mps.is_available():
+                device = "mps"
+            elif torch.cuda.is_available():
+                device = "cuda"
+            else:
+                device = "cpu"
+
         self.device = device
         self.model = PredictorNet(latent_dim).to(device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)

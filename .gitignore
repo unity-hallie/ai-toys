@@ -1,0 +1,22 @@
+// Generated data and models - do not check in
+data/
+toys_models/
+
+// Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+// Environment
+.venv/
+venv/
+env/
+
+// IDE
+.vscode/
+.idea/
+*.swp
+*.swo
