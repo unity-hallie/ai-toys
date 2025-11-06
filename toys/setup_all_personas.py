@@ -15,6 +15,13 @@ if __name__ == "__main__":
         ("data/frankenstein.txt", "frankenstein"),
         ("data/waste_land.txt", "waste_land"),
         ("data/persuasion.txt", "persuasion"),
+        ("data/moby_dick.txt", "moby"),
+        ("data/mrs_dalloway.txt", "woolf"),
+        ("data/great_gatsby.txt", "gatsby"),
+        ("data/jane_eyre.txt", "jane"),
+        ("data/don_quixote.txt", "quixote"),
+        ("data/alice_wonderland.txt", "alice"),
+        ("data/meditations.txt", "marcus"),
     ]
 
     print("\n" + "=" * 70)

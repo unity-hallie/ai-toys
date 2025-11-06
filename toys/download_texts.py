@@ -47,6 +47,13 @@ if __name__ == "__main__":
         ("https://www.gutenberg.org/cache/epub/84/pg84.txt", "data/frankenstein.txt", "Frankenstein"),
         ("https://www.gutenberg.org/cache/epub/1321/pg1321.txt", "data/waste_land.txt", "The Waste Land"),
         ("https://www.gutenberg.org/cache/epub/105/pg105.txt", "data/persuasion.txt", "Persuasion"),
+        ("https://www.gutenberg.org/cache/epub/2701/pg2701.txt", "data/moby_dick.txt", "Moby Dick"),
+        ("https://www.gutenberg.org/cache/epub/141/pg141.txt", "data/mrs_dalloway.txt", "Mrs. Dalloway"),
+        ("https://www.gutenberg.org/cache/epub/4671/pg4671.txt", "data/great_gatsby.txt", "The Great Gatsby"),
+        ("https://www.gutenberg.org/cache/epub/1260/pg1260.txt", "data/jane_eyre.txt", "Jane Eyre"),
+        ("https://www.gutenberg.org/cache/epub/996/pg996.txt", "data/don_quixote.txt", "Don Quixote"),
+        ("https://www.gutenberg.org/cache/epub/11/pg11.txt", "data/alice_wonderland.txt", "Alice in Wonderland"),
+        ("https://www.gutenberg.org/cache/epub/2680/pg2680.txt", "data/meditations.txt", "Meditations"),
     ]
 
     print("=" * 70)

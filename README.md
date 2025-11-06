@@ -11,12 +11,24 @@ Each persona (text source) learns:
    - Trained to predict chunk_i+1 from chunk_i in latent space
    - Cheap, fast, interpretable
 
-## The Four Personas
+## The Eleven Personas
 
-- **Velveteen Rabbit** (Margery Williams) - Love, becoming real
-- **Frankenstein** (Mary Shelley) - Creation, obsession, suffering
-- **The Waste Land** (T.S. Eliot) - Fragmentation, modernism
-- **Persuasion** (Jane Austen) - Social dynamics, restraint
+**Romantic/Gothic:**
+- **Velveteen Rabbit** (Margery Williams) - Love, becoming real, tenderness
+- **Frankenstein** (Mary Shelley) - Creation, obsession, suffering, ambition
+- **Jane Eyre** (Charlotte Brontë) - Independence, passion, Gothic atmosphere
+- **Don Quixote** (Cervantes) - Idealism vs reality, adventure, madness
+
+**Modernist/Introspective:**
+- **The Waste Land** (T.S. Eliot) - Fragmentation, modernism, decay
+- **Mrs. Dalloway** (Virginia Woolf) - Consciousness, interiority, time-flux
+- **The Great Gatsby** (F. Scott Fitzgerald) - Dreams, illusion, excess
+
+**Philosophical/Ludic:**
+- **Meditations** (Marcus Aurelius) - Stoic acceptance, duty, inner peace
+- **Alice in Wonderland** (Lewis Carroll) - Logic, whimsy, nonsense
+- **Persuasion** (Jane Austen) - Social dynamics, restraint, delayed satisfaction
+- **Moby Dick** (Herman Melville) - Obsession, the sea, defiance
 
 ## Quick Start
 
@@ -37,8 +49,21 @@ This downloads from Project Gutenberg into `data/`.
 ### 3. Train All Personas
 
 ```bash
-# One at a time, or run the batch script:
+# All at once (recommended):
 python toys/setup_all_personas.py
+
+# Or one at a time:
+python -m toys.train_persona --text-path data/velveteen_rabbit.txt --persona-name velveteen
+python -m toys.train_persona --text-path data/frankenstein.txt --persona-name frankenstein
+python -m toys.train_persona --text-path data/jane_eyre.txt --persona-name jane
+python -m toys.train_persona --text-path data/don_quixote.txt --persona-name quixote
+python -m toys.train_persona --text-path data/waste_land.txt --persona-name waste_land
+python -m toys.train_persona --text-path data/mrs_dalloway.txt --persona-name woolf
+python -m toys.train_persona --text-path data/great_gatsby.txt --persona-name gatsby
+python -m toys.train_persona --text-path data/meditations.txt --persona-name marcus
+python -m toys.train_persona --text-path data/alice_wonderland.txt --persona-name alice
+python -m toys.train_persona --text-path data/persuasion.txt --persona-name persuasion
+python -m toys.train_persona --text-path data/moby_dick.txt --persona-name moby
 ```
 
 This trains PCA + Predictor for each text source.
@@ -111,20 +136,30 @@ toys/
 └── setup_all_personas.py # Batch training script
 
 toys_models/
-├── pca_velveteen.pkl
-├── pca_frankenstein.pkl
-├── pca_waste_land.pkl
-├── pca_persuasion.pkl
-├── predictor_velveteen.pt
-├── predictor_frankenstein.pt
-├── predictor_waste_land.pt
-└── predictor_persuasion.pt
+├── pca_velveteen.pkl         ├── predictor_velveteen.pt
+├── pca_frankenstein.pkl      ├── predictor_frankenstein.pt
+├── pca_jane.pkl              ├── predictor_jane.pt
+├── pca_quixote.pkl           ├── predictor_quixote.pt
+├── pca_waste_land.pkl        ├── predictor_waste_land.pt
+├── pca_woolf.pkl             ├── predictor_woolf.pt
+├── pca_gatsby.pkl            ├── predictor_gatsby.pt
+├── pca_marcus.pkl            ├── predictor_marcus.pt
+├── pca_alice.pkl             ├── predictor_alice.pt
+├── pca_persuasion.pkl        ├── predictor_persuasion.pt
+└── pca_moby.pkl              └── predictor_moby.pt
 
 data/
 ├── velveteen_rabbit.txt
 ├── frankenstein.txt
+├── jane_eyre.txt
+├── don_quixote.txt
 ├── waste_land.txt
-└── persuasion.txt
+├── mrs_dalloway.txt
+├── great_gatsby.txt
+├── meditations.txt
+├── alice_wonderland.txt
+├── persuasion.txt
+└── moby_dick.txt
 ```
 
 ## Why This Approach?
