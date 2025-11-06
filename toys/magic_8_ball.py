@@ -116,6 +116,82 @@ class Magic8Ball:
         self.response_vectors_24d = self.pca.transform(response_embeddings_384d)
         print(f"   Shape: {self.response_vectors_24d.shape}")
 
+    def _find_best_response(
+        self, predicted_24d: np.ndarray
+    ) -> Tuple[str, float, list]:
+        """Match predicted response to the 10 options.
+
+        THE PROBLEM:
+        ============
+
+        You have:
+        - predicted_24d: the network's prediction (24 numbers)
+        - 10 response options, each also 24 numbers
+
+        GOAL: Which of the 10 is closest to the prediction?
+
+        THE SOLUTION: Cosine Similarity
+        ===============================
+
+        Imagine two arrows in space:
+        - One points in the direction of predicted_24d
+        - One points in the direction of response_i
+
+        Cosine similarity measures the angle between them:
+        - Angle = 0°   (same direction)     → similarity = 1.0  (perfect match)
+        - Angle = 90°  (perpendicular)      → similarity = 0.0  (unrelated)
+        - Angle = 180° (opposite direction) → similarity = -1.0 (inverse)
+
+        FORMULA (math-free version):
+        ============================
+        similarity = (predicted · response) / (length_pred × length_resp)
+
+        Where:
+        - (predicted · response) = how much they point in same direction
+        - length = how far the arrow is from origin
+        - Division = normalize so result is between -1 and 1
+
+        WHY THIS METRIC?
+        ================
+        - Fast to compute
+        - Makes sense geometrically
+        - Works well for high-dimensional spaces
+        - Robust to magnitude (only direction matters)
+
+        PRACTICAL EXAMPLE:
+        ==================
+        If predicted_24d is "cautious + uncertain + wait"
+        And response "Yes, but proceed cautiously" is also "cautious + uncertain + yes"
+        Then similarity is high (0.35-0.55) because they point similar directions.
+
+        REAL ALGORITHM:
+        ===============
+        1. For each of 10 responses:
+           a. Calculate cosine similarity
+        2. Sort by similarity (highest first)
+        3. Return: best match, its score, and 2 alternatives
+        """
+        similarities = {}
+
+        for i, response_text in enumerate(self.RESPONSES):
+            response_24d = self.response_vectors_24d[i]
+
+            # Cosine similarity: (dot product) / (norms)
+            dot_product = np.dot(predicted_24d, response_24d)
+            pred_norm = np.linalg.norm(predicted_24d)
+            resp_norm = np.linalg.norm(response_24d)
+
+            # Epsilon (1e-8) prevents division by zero
+            similarity = dot_product / (pred_norm * resp_norm + 1e-8)
+            similarities[response_text] = similarity
+
+        # Sort by similarity (highest first)
+        sorted_responses = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
+        closest_response, closest_similarity = sorted_responses[0]
+        alternatives = [r for r, _ in sorted_responses[1:3]]
+
+        return closest_response, closest_similarity, alternatives
+
     def consult(self, question_text: str) -> Dict:
         """
         Consult the magic 8 ball.
@@ -175,22 +251,10 @@ class Magic8Ball:
         # Predict response through predictor
         predicted_response_24d = self.predictor.predict(question_24d)
 
-        # Compute cosine similarity to each response
-        similarities = {}
-        for i, response_text in enumerate(self.RESPONSES):
-            response_24d = self.response_vectors_24d[i]
-            # Cosine similarity
-            sim = np.dot(predicted_response_24d, response_24d) / (
-                np.linalg.norm(predicted_response_24d)
-                * np.linalg.norm(response_24d)
-                + 1e-8
-            )
-            similarities[response_text] = sim
-
-        # Sort by similarity
-        sorted_responses = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
-        closest_response, closest_similarity = sorted_responses[0]
-        alternatives = [r for r, _ in sorted_responses[1:3]]
+        # Find the closest response
+        closest_response, closest_similarity, alternatives = self._find_best_response(
+            predicted_response_24d
+        )
 
         return {
             "question": question_text,

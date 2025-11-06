@@ -54,6 +54,58 @@ class PCATrainer:
         self.pca = None
         print(f"📦 Loaded embedding model: {model_name}")
 
+    def _fit_and_explain_pca(self, embeddings: np.ndarray) -> None:
+        """Fit PCA and explain what's happening in plain language.
+
+        WHAT'S HAPPENING (no math trauma allowed):
+        ==========================================
+
+        You have 384 numbers per chunk (384D embedding).
+        PCA finds the 24 most "important" directions.
+
+        Think of it like taking a photo of a landscape:
+        - Real world: infinite detail (384D)
+        - Photo: captures the essence in 2D
+        - PCA: finds which axes capture the most "variation"
+
+        The process:
+        1. Look at all the chunks together
+        2. Find which directions have the most "spread" (variation)
+        3. Keep the top 24 directions, discard the rest
+        4. Transform each chunk: 384 numbers → 24 numbers (90% of variation preserved)
+
+        WHY 24D?
+        ========
+        The Leech lattice (a geometric structure) has 24 dimensions.
+        It's special: it packs spheres more efficiently than any other 24D pattern.
+        Maybe semantic space wants to be that efficient too?
+
+        THE MATH (if you're curious):
+        ============================
+        PCA finds eigenvectors of the covariance matrix.
+        The eigenvectors point in directions of maximum spread.
+        We keep the 24 with the largest eigenvalues.
+
+        READABLE ALTERNATIVE:
+        =====================
+        If you want to understand it without equations:
+        - Imagine chunks scattered in 384D space
+        - Find the axis where they spread out most: that's direction #1
+        - Find the axis perpendicular to #1 where they spread most: direction #2
+        - Repeat 22 more times
+        - Now you have 24 axes that capture the "shape" of your data
+        """
+        self.pca = PCA(n_components=self.output_dim)
+        self.pca.fit(embeddings)
+
+        explained_variance = self.pca.explained_variance_ratio_.sum()
+        print(f"   ✓ Captured {explained_variance*100:.1f}% of the variation")
+        print(f"   ✓ Reduced from 384D to {self.output_dim}D")
+        print(f"   ✓ Each dimension captures: ", end="")
+        for i, var in enumerate(self.pca.explained_variance_ratio_[:5]):
+            print(f"{var*100:.1f}% ", end="")
+        print("...")
+
     def _split_into_chunks(self, text: str, chunk_size: int = 100) -> List[str]:
         """Split text into sentence-based chunks.
 
@@ -158,12 +210,7 @@ class PCATrainer:
 
         # Fit PCA
         print(f"🔄 Fitting PCA to {self.output_dim}D (Leech lattice)...")
-        self.pca = PCA(n_components=self.output_dim)
-        self.pca.fit(embeddings)
-
-        explained_variance = self.pca.explained_variance_ratio_.sum()
-        print(f"   Explained variance: {explained_variance:.4f}")
-        print(f"   Variance per component: {self.pca.explained_variance_ratio_}")
+        self._fit_and_explain_pca(embeddings)
 
         # Save
         with open(output_path, "wb") as f:

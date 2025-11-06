@@ -29,6 +29,57 @@ import numpy as np
 class PredictorNet(nn.Module):
     """Small 24D → 24D predictor for chunk sequences.
 
+    THE BIG IDEA:
+    =============
+
+    Input: 24D vector (chunk_i)
+    Output: 24D vector (predicted chunk_i+1)
+
+    The network is a simple transformation: take semantic input, transform it through
+    layers of thinking, output the predicted next semantic state.
+
+    WHY MULTIPLE LAYERS?
+    ====================
+
+    Single layer: LINEAR transformation only
+    - Fast but limited: can only rotate/scale the space
+    - Like: can only change the direction, not learn complex patterns
+
+    Multiple layers: LINEAR → NONLINEAR → LINEAR → NONLINEAR → LINEAR
+    - Slower but more powerful: can learn curved relationships
+    - Like: can learn "if concept A increases, concept B decreases in a complex way"
+
+    The ReLU activation function:
+    - Linear is flat: f(x) = ax + b
+    - ReLU bends it: f(x) = max(0, x)  (dead below zero, linear above)
+    - This bend lets the network learn nonlinear patterns
+
+    ARCHITECTURE:
+    ==============
+
+    Layer 1:   24D → 48D   (expand: "think about more aspects")
+               ReLU        (nonlinear: "think creatively")
+
+    Layer 2:   48D → 24D   (compress: "synthesize back to core concepts")
+               ReLU        (nonlinear again)
+
+    Layer 3:   24D → 24D   (final output)
+               (no ReLU: let output be any value)
+
+    TOTAL PARAMETERS: ~2,400 (very small, intentionally)
+
+    WHY SO SMALL?
+    ==============
+    - We're training on small texts (100-50,000 chunks)
+    - Bigger network = overfits (memorizes instead of learning pattern)
+    - Smaller network = learns the essential semantic flow
+
+    ANALOGY:
+    ========
+    Imagine teaching someone to write poetry:
+    - A huge brain might memorize all examples (bad)
+    - A small brain must extract the essence (good)
+
     ❓ ARCHITECTURE QUESTIONS:
 
     1. Is this network size right?
@@ -194,45 +245,149 @@ class PredictorTrainer:
         if n_chunks < 2:
             raise ValueError("Need at least 2 chunks to train")
 
-        # Create (chunk_i, chunk_i+1) pairs
-        chunk_data = torch.FloatTensor(latent_chunks).to(self.device)
-        input_chunks = chunk_data[:-1]  # chunk_i
-        target_chunks = chunk_data[1:]  # chunk_i+1
+        # Create training data and train
+        input_chunks, target_chunks = self._prepare_chunk_pairs(latent_chunks)
+        history = self._train_with_early_stopping(input_chunks, target_chunks, epochs, batch_size, patience)
+        return history
 
+    def _prepare_chunk_pairs(self, latent_chunks: np.ndarray) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Create (chunk_i, chunk_i+1) training pairs.
+
+        WHAT'S HAPPENING:
+        =================
+
+        You have a sequence of text chunks, each represented as a 24D vector.
+
+        chunk_0 → chunk_1 → chunk_2 → chunk_3 → ... → chunk_N
+
+        We create training examples:
+        - Input: chunk_0,  Target: chunk_1 (predict the next chunk)
+        - Input: chunk_1,  Target: chunk_2
+        - Input: chunk_2,  Target: chunk_3
+        - ... and so on
+
+        WHY?
+        ====
+        The network learns: "given chunk_i's semantic meaning, what would chunk_i+1 likely be?"
+
+        This teaches the network the DIRECTION of semantic flow in this person's writing.
+
+        Think of it like:
+        - Completing sentences: "The sun is ___" → "bright"
+        - Finding patterns: In Austen's writing, discussions of society lead to...?
+        - Learning the rhythm: Melville's obsession, Woolf's fragmentation
+
+        THE RESULT:
+        ===========
+        After training, the network has learned this persona's semantic "next step."
+        When you ask it a question, it predicts what that persona would say next.
+        """
+        chunk_data = torch.FloatTensor(latent_chunks).to(self.device)
+        input_chunks = chunk_data[:-1]   # all but last: chunk_0, chunk_1, ... chunk_N-1
+        target_chunks = chunk_data[1:]   # all but first: chunk_1, chunk_2, ... chunk_N
+        return input_chunks, target_chunks
+
+    def _train_with_early_stopping(
+        self,
+        input_chunks: torch.Tensor,
+        target_chunks: torch.Tensor,
+        epochs: int,
+        batch_size: int,
+        patience: int,
+    ) -> dict:
+        """Train the predictor with early stopping.
+
+        WHAT'S HAPPENING:
+        =================
+
+        We're teaching the network to predict: given chunk_i (input), output chunk_i+1 (target).
+
+        TRAINING LOOP (simplified):
+        ===========================
+
+        For each epoch (1 to max_epochs):
+          1. Shuffle data into mini-batches
+          2. For each batch:
+             a. Feed batch through network: prediction = network(input)
+             b. Calculate error: loss = distance(prediction, target)
+             c. Improve network weights to reduce error
+             d. Repeat
+
+          3. After epoch, check: did we improve?
+             - If yes: reset patience counter
+             - If no: increment patience counter
+             - If patience runs out: stop (we've learned what we can)
+
+        MATH-FREE VERSION:
+        ==================
+        Think of it like teaching someone to write in a style:
+
+        1. Show them examples: (Austen sentence) → (Austen's next sentence)
+        2. They try: guess what comes next
+        3. You tell them if they're right or wrong
+        4. They learn from mistakes
+        5. Eventually they can continue the style
+        6. When they stop improving, they've learned the style
+
+        THE HYPERPARAMETERS:
+        ====================
+        - epochs: max training iterations
+        - batch_size: how many examples per training step (4 = learn from 4 examples at once)
+        - patience: how many epochs without improvement before giving up
+
+        WHY SMALL BATCHES?
+        ==================
+        Batch size 4 means we look at 4 examples before updating weights.
+        This is more stable than looking at 1 example at a time.
+        But not so many that we lose flexibility.
+        """
         best_loss = float("inf")
         patience_counter = 0
         history = {"loss": []}
 
         print(f"📚 Training predictor on {len(input_chunks)} chunk pairs...")
+        print(f"   Device: {self.device.upper()}")
+        print(f"   Batch size: {batch_size}, Max epochs: {epochs}, Patience: {patience}")
+        print()
+
         for epoch in range(epochs):
-            # Mini-batch training
             total_loss = 0
+            num_batches = 0
+
+            # Process mini-batches
             for i in range(0, len(input_chunks), batch_size):
                 batch_input = input_chunks[i : i + batch_size]
                 batch_target = target_chunks[i : i + batch_size]
 
-                self.optimizer.zero_grad()
+                # Forward pass: compute prediction
                 pred = self.model(batch_input)
+
+                # Compute error
                 loss = self.criterion(pred, batch_target)
-                loss.backward()
-                self.optimizer.step()
+
+                # Backward pass: update weights to reduce error
+                self.optimizer.zero_grad()  # Clear old gradients
+                loss.backward()              # Compute new gradients
+                self.optimizer.step()        # Update weights
 
                 total_loss += loss.item()
+                num_batches += 1
 
-            avg_loss = total_loss / (len(input_chunks) // batch_size + 1)
+            avg_loss = total_loss / num_batches
             history["loss"].append(avg_loss)
 
+            # Progress update every 10 epochs
             if (epoch + 1) % 10 == 0:
-                print(f"   Epoch {epoch+1}/{epochs}: loss = {avg_loss:.6f}")
+                print(f"   Epoch {epoch+1:3d}/{epochs}: loss = {avg_loss:.6f}")
 
-            # Early stopping
+            # Early stopping: if we're not improving, stop training
             if avg_loss < best_loss:
                 best_loss = avg_loss
                 patience_counter = 0
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
-                    print(f"   Early stopping at epoch {epoch+1}")
+                    print(f"   → Early stopping at epoch {epoch+1} (no improvement for {patience} epochs)")
                     break
 
         print(f"✅ Training complete. Final loss: {best_loss:.6f}")
