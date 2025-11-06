@@ -11,6 +11,38 @@ Each persona (text source) learns:
    - Trained to predict chunk_i+1 from chunk_i in latent space
    - Cheap, fast, interpretable
 
+## Understanding the Code
+
+**New to this? Start here:**
+
+- **[HOW_IT_WORKS.md](HOW_IT_WORKS.md)** — Gentle explanation without math trauma
+  - What's an embedding?
+  - Why compress to 24D?
+  - How does the network learn?
+  - Common questions answered
+
+**Want to understand the algorithms?**
+
+Every function has a docstring with:
+1. Plain-language explanation
+2. Intuitive analogy
+3. The algorithm/formula (if you're curious)
+
+Start with:
+- `pca_trainer.py` — PCA compression explained
+- `predictor_model.py` — Network training explained
+- `magic_8_ball.py` — Similarity matching explained
+- `tarot.py` — Distance matching explained
+
+**Math-traumatized?**
+
+All the code comments assume you are. Look for:
+- "WHAT'S HAPPENING" sections (no equations)
+- "Analogy" sections (real-world examples)
+- Then optionally "THE MATH" sections (equations, if interested)
+
+---
+
 ## The Twelve Personas
 
 **Romantic/Gothic:**

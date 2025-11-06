@@ -174,15 +174,72 @@ class TarotReader:
         # Predict response through predictor
         predicted_response_24d = self.predictor.predict(question_24d)
 
-        # Compute distance to each card
+        # Find closest cards
+        drawn = self._find_closest_cards(predicted_response_24d, num_cards)
+        return drawn
+
+    def _find_closest_cards(self, predicted_24d: np.ndarray, num_cards: int) -> List[str]:
+        """Find the closest tarot cards to the prediction.
+
+        THE PROBLEM:
+        ============
+
+        You have:
+        - predicted_24d: network's prediction (24D)
+        - 22 cards, each also 24D
+
+        GOAL: Which cards are closest to what the network predicted?
+
+        THE SOLUTION: Euclidean Distance
+        =================================
+
+        Imagine points scattered in 24D space.
+        How far is the prediction from each card?
+
+        In 2D (for intuition):
+            Question:  (0, 0)
+            Card A:    (3, 4)  → distance = sqrt(3² + 4²) = 5
+            Card B:    (1, 1)  → distance = sqrt(1² + 1²) = 1.4
+
+            Card B is closer.
+
+        In 24D (same idea, 24 numbers instead of 2):
+            distance = sqrt((p₁-c₁)² + (p₂-c₂)² + ... + (p₂₄-c₂₄)²)
+
+        WHERE USED:
+        ===========
+        - GPS: finding nearest restaurants
+        - Astronomy: finding nearest stars
+        - Tarot: finding nearest semantic cards
+
+        WHY DISTANCE vs SIMILARITY?
+        ===========================
+        - Similarity: "how aligned" (direction)
+        - Distance: "how close" (space)
+
+        For cards, distance makes intuitive sense:
+        "Death" is closer to "The Hanged Man" (both dark) than "The Sun"
+
+        The algorithm:
+        ==============
+        1. For each of 22 cards:
+           a. Calculate distance from prediction
+        2. Sort by distance (smallest first = closest)
+        3. Return the N closest cards
+        """
         distances = {}
+
         for i, card_name in enumerate(MAJOR_ARCANA):
             card_24d = self.card_vectors_24d[i]
-            # Euclidean distance
-            distance = np.linalg.norm(predicted_response_24d - card_24d)
+
+            # Euclidean distance: sqrt(sum of squared differences)
+            # np.linalg.norm(x) = sqrt(x₁² + x₂² + ... + x₂₄²)
+            difference = predicted_24d - card_24d
+            distance = np.linalg.norm(difference)
+
             distances[card_name] = distance
 
-        # Sort by distance (closest = best match)
+        # Sort by distance (closest = smallest)
         sorted_cards = sorted(distances.items(), key=lambda x: x[1])
         drawn = [card for card, _ in sorted_cards[:num_cards]]
 
