@@ -154,7 +154,7 @@
         <div class="reference algorithm">
             <strong>Principal Component Analysis (PCA)</strong>
             <p>Dimensionality reduction technique used to compress 384D embeddings to 24D.</p>
-            <p><strong>Citation:</strong> Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). Springer-Verlag.</p>
+            <p><strong>Reference:</strong> Jolliffe, I. T. (2002). <em>Principal Component Analysis</em> (2nd ed.). Springer-Verlag. — Standard reference text for PCA.</p>
             <div class="tag method">Mathematics</div>
             <div class="tag method">Dimensionality Reduction</div>
         </div>
@@ -164,8 +164,8 @@
             <p>24-dimensional geometric structure with exceptional symmetry properties. Chosen as the target dimension for PCA compression due to its mathematical properties and potential for emergent structure in semantic projection.</p>
             <p><strong>References:</strong></p>
             <ul>
-                <li>Conway, J. H., & Sloane, N. J. A. (1999). <em>Sphere Packings, Lattices, and Groups</em> (3rd ed.). Springer.</li>
-                <li>Viazovska, M. (2016). The Sphere Packing Problem in Dimension 8. Annals of Mathematics, 185(3), 991-1015.</li>
+                <li>Conway, J. H., & Sloane, N. J. A. (1999). <em>Sphere Packings, Lattices, and Groups</em> (3rd ed.). Springer. — Comprehensive foundational treatment of lattice structures.</li>
+                <li>Viazovska, M. (2016). "The sphere packing problem in dimension 8." <em>Annals of Mathematics</em>, 185(3), 991-1015. — Breakthrough proof that E₈ lattice is optimal; extends to Leech lattice in dimension 24.</li>
             </ul>
             <div class="tag algorithm">Geometry</div>
             <div class="tag method">Mathematics</div>
@@ -173,7 +173,7 @@
 
         <div class="reference algorithm">
             <strong>Cosine Similarity</strong>
-            <p>Distance metric used for matching questions/cards to learned semantic vectors.</p>
+            <p>Distance metric used for matching questions/cards to learned semantic vectors. Standard metric in NLP for comparing vector embeddings.</p>
             <div class="tag method">Mathematics</div>
             <div class="tag method">Similarity Metrics</div>
         </div>
@@ -184,25 +184,14 @@
 
         <div class="reference algorithm">
             <strong>Sequence Prediction in Latent Space</strong>
-            <p>The Predictor model learns to predict chunk_{i+1} from chunk_i in the 24D latent space, capturing directional semantic tendency specific to each text/persona.</p>
-            <p><strong>Related work:</strong></p>
+            <p>The Predictor model learns to predict chunk_{i+1} from chunk_i in the 24D latent space, capturing directional semantic tendency specific to each text/persona. This relates to foundational work on learning dependencies through sequential prediction.</p>
+            <p><strong>Key References:</strong></p>
             <ul>
-                <li>Bengio, Y., Simard, P., & Frasconi, P. (1994). Learning Long-Term Dependencies with Gradient Descent is Difficult. IEEE Transactions on Neural Networks, 5(2), 157-166.</li>
-                <li>Hochreiter, S., Bengio, Y., Frasconi, P., & Schmidhuber, J. (2001). Gradient Flow in Recurrent Nets: The Difficulty of Learning Long-Term Dependencies. In A Field Guide to Dynamical Recurrent Networks.</li>
+                <li>Bengio, Y., Simard, P., & Frasconi, P. (1994). "Learning Long-Term Dependencies with Gradient Descent is Difficult." <em>IEEE Transactions on Neural Networks</em>, 5(2), 157-166.</li>
+                <li>Hochreiter, S., Bengio, Y., Frasconi, P., & Schmidhuber, J. (2001). "Gradient Flow in Recurrent Nets: The Difficulty of Learning Long-Term Dependencies." In <em>A Field Guide to Dynamical Recurrent Networks</em>. IEEE Press.</li>
             </ul>
             <div class="tag method">Deep Learning</div>
             <div class="tag method">Sequence Models</div>
-        </div>
-
-        <div class="reference algorithm">
-            <strong>Personalized Language Models</strong>
-            <p>The approach of training separate lightweight models per persona, rather than a single large model, relates to work in style transfer and author modeling.</p>
-            <p><strong>Related work:</strong></p>
-            <ul>
-                <li>Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., ... & Bengio, Y. (2014). Generative Adversarial Networks. arXiv preprint arXiv:1406.2661.</li>
-            </ul>
-            <div class="tag method">NLP</div>
-            <div class="tag method">Style Transfer</div>
         </div>
     </div>
 
