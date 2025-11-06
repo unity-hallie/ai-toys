@@ -56,6 +56,81 @@ MAJOR_ARCANA = [
     "The World",
 ]
 
+# Minor Arcana - Wands (14 cards)
+WANDS = [
+    "Ace of Wands",
+    "Two of Wands",
+    "Three of Wands",
+    "Four of Wands",
+    "Five of Wands",
+    "Six of Wands",
+    "Seven of Wands",
+    "Eight of Wands",
+    "Nine of Wands",
+    "Ten of Wands",
+    "Page of Wands",
+    "Knight of Wands",
+    "Queen of Wands",
+    "King of Wands",
+]
+
+# Minor Arcana - Cups (14 cards)
+CUPS = [
+    "Ace of Cups",
+    "Two of Cups",
+    "Three of Cups",
+    "Four of Cups",
+    "Five of Cups",
+    "Six of Cups",
+    "Seven of Cups",
+    "Eight of Cups",
+    "Nine of Cups",
+    "Ten of Cups",
+    "Page of Cups",
+    "Knight of Cups",
+    "Queen of Cups",
+    "King of Cups",
+]
+
+# Minor Arcana - Swords (14 cards)
+SWORDS = [
+    "Ace of Swords",
+    "Two of Swords",
+    "Three of Swords",
+    "Four of Swords",
+    "Five of Swords",
+    "Six of Swords",
+    "Seven of Swords",
+    "Eight of Swords",
+    "Nine of Swords",
+    "Ten of Swords",
+    "Page of Swords",
+    "Knight of Swords",
+    "Queen of Swords",
+    "King of Swords",
+]
+
+# Minor Arcana - Pentacles (14 cards)
+PENTACLES = [
+    "Ace of Pentacles",
+    "Two of Pentacles",
+    "Three of Pentacles",
+    "Four of Pentacles",
+    "Five of Pentacles",
+    "Six of Pentacles",
+    "Seven of Pentacles",
+    "Eight of Pentacles",
+    "Nine of Pentacles",
+    "Ten of Pentacles",
+    "Page of Pentacles",
+    "Knight of Pentacles",
+    "Queen of Pentacles",
+    "King of Pentacles",
+]
+
+# All tarot cards (78 total)
+ALL_TAROT_CARDS = MAJOR_ARCANA + WANDS + CUPS + SWORDS + PENTACLES
+
 
 class TarotReader:
     """Card oracle using PCA + Predictor models."""
@@ -122,10 +197,10 @@ class TarotReader:
             )
 
     def _precompute_card_embeddings(self) -> np.ndarray:
-        """Precompute all major arcana card vectors in latent space."""
-        print(f"📚 Embedding {len(MAJOR_ARCANA)} major arcana cards...")
+        """Precompute all tarot card vectors in latent space."""
+        print(f"📚 Embedding {len(ALL_TAROT_CARDS)} tarot cards...")
         card_embeddings_384d = self.embedder.encode(
-            MAJOR_ARCANA, convert_to_numpy=True
+            ALL_TAROT_CARDS, convert_to_numpy=True
         )
         card_vectors_24d = self.pca.transform(card_embeddings_384d)
         print(f"   Shape: {card_vectors_24d.shape}")
@@ -216,64 +291,14 @@ class TarotReader:
         return drawn
 
     def _find_closest_cards(self, predicted_24d: np.ndarray, num_cards: int) -> List[str]:
-        """Find the closest tarot cards to the prediction.
-
-        THE PROBLEM:
-        ============
-
-        You have:
-        - predicted_24d: network's prediction (24D)
-        - 22 cards, each also 24D
-
-        GOAL: Which cards are closest to what the network predicted?
-
-        THE SOLUTION: Euclidean Distance
-        =================================
-
-        Imagine points scattered in 24D space.
-        How far is the prediction from each card?
-
-        In 2D (for intuition):
-            Question:  (0, 0)
-            Card A:    (3, 4)  → distance = sqrt(3² + 4²) = 5
-            Card B:    (1, 1)  → distance = sqrt(1² + 1²) = 1.4
-
-            Card B is closer.
-
-        In 24D (same idea, 24 numbers instead of 2):
-            distance = sqrt((p₁-c₁)² + (p₂-c₂)² + ... + (p₂₄-c₂₄)²)
-
-        WHERE USED:
-        ===========
-        - GPS: finding nearest restaurants
-        - Astronomy: finding nearest stars
-        - Tarot: finding nearest semantic cards
-
-        WHY DISTANCE vs SIMILARITY?
-        ===========================
-        - Similarity: "how aligned" (direction)
-        - Distance: "how close" (space)
-
-        For cards, distance makes intuitive sense:
-        "Death" is closer to "The Hanged Man" (both dark) than "The Sun"
-
-        The algorithm:
-        ==============
-        1. For each of 22 cards:
-           a. Calculate distance from prediction
-        2. Sort by distance (smallest first = closest)
-        3. Return the N closest cards
-        """
+        """Find the closest tarot cards to the prediction using Euclidean distance."""
         distances = {}
 
-        for i, card_name in enumerate(MAJOR_ARCANA):
+        for i, card_name in enumerate(ALL_TAROT_CARDS):
             card_24d = self.card_vectors_24d[i]
-
             # Euclidean distance: sqrt(sum of squared differences)
-            # np.linalg.norm(x) = sqrt(x₁² + x₂² + ... + x₂₄²)
             difference = predicted_24d - card_24d
             distance = np.linalg.norm(difference)
-
             distances[card_name] = distance
 
         # Sort by distance (closest = smallest)
