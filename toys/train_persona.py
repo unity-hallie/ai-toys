@@ -29,6 +29,26 @@ def train_persona(text_path: str, persona_name: str, output_dir: str = "toys_mod
         persona_name: Name for this persona (hallie, victor, etc)
         output_dir: Where to save models
     """
+    # Validate text file exists and is readable
+    text_path = Path(text_path)
+    if not text_path.exists():
+        raise FileNotFoundError(f"Text file not found: {text_path}")
+
+    try:
+        with open(text_path, encoding="utf-8") as f:
+            text = f.read()
+    except UnicodeDecodeError:
+        # Fallback to ISO-8859-1 if UTF-8 fails
+        print(f"⚠️  UTF-8 decoding failed for {text_path}, trying ISO-8859-1...")
+        with open(text_path, encoding="iso-8859-1") as f:
+            text = f.read()
+
+    if not text or len(text.strip()) < 100:
+        raise ValueError(
+            f"Text file too small ({len(text)} chars). "
+            "Need at least 100 characters for meaningful training."
+        )
+
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 

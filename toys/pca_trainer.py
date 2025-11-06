@@ -27,6 +27,7 @@ WHY PCA?
 
 import json
 import pickle
+import re
 from pathlib import Path
 from typing import List, Tuple
 import numpy as np
@@ -128,7 +129,12 @@ class PCATrainer:
            - Semantic coherence? Token count? Computational efficiency?
            - Should that constraint be explicit?
         """
-        sentences = [s.strip() for s in text.split(".") if s.strip()]
+        # Use regex-based sentence splitting to handle abbreviations better
+        # Splits on sentence-ending punctuation (., !, ?) followed by space
+        # This avoids splitting on abbreviations like "U.S." or "Dr."
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = [s.strip() for s in sentences if s.strip()]
+
         chunks = []
         current_chunk = []
         current_length = 0
@@ -136,7 +142,7 @@ class PCATrainer:
         for sent in sentences:
             words = sent.split()
             if current_length + len(words) > chunk_size and current_chunk:
-                chunks.append(". ".join(current_chunk) + ".")
+                chunks.append(" ".join(current_chunk))
                 current_chunk = [sent]
                 current_length = len(words)
             else:
@@ -144,7 +150,7 @@ class PCATrainer:
                 current_length += len(words)
 
         if current_chunk:
-            chunks.append(". ".join(current_chunk) + ".")
+            chunks.append(" ".join(current_chunk))
 
         return chunks
 
@@ -272,8 +278,24 @@ class PCATrainer:
            - Currently: FileNotFoundError bubbles up
            - Should we provide better error context?
         """
-        with open(pca_path, "rb") as f:
-            pca = pickle.load(f)
+        pca_path = Path(pca_path)
+        if not pca_path.exists():
+            raise FileNotFoundError(f"PCA model not found: {pca_path}")
+
+        try:
+            with open(pca_path, "rb") as f:
+                pca = pickle.load(f)
+        except (pickle.UnpicklingError, EOFError) as e:
+            raise ValueError(f"Corrupted PCA model file {pca_path}: {e}")
+        except Exception as e:
+            raise ValueError(f"Failed to load PCA model {pca_path}: {e}")
+
+        # Validate that we actually loaded a PCA object
+        if not isinstance(pca, PCA):
+            raise TypeError(
+                f"Expected sklearn.decomposition.PCA, got {type(pca).__name__}"
+            )
+
         trainer = PCATrainer()
         trainer.pca = pca
         return trainer

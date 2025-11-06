@@ -25,6 +25,7 @@ from typing import Dict, List
 from sentence_transformers import SentenceTransformer
 from toys.predictor_model import PredictorTrainer
 import logging
+from toys.magic_8_ball import get_embedder
 
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 
@@ -69,22 +70,37 @@ class TarotReader:
         """
         self.persona_name = persona_name
         self.models_dir = Path(models_dir)
-        self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        self.embedder = get_embedder("all-MiniLM-L6-v2")
 
         # Load PCA
         pca_path = self.models_dir / f"pca_{persona_name}.pkl"
         if not pca_path.exists():
             raise FileNotFoundError(f"PCA model not found: {pca_path}")
-        with open(pca_path, "rb") as f:
-            self.pca = pickle.load(f)
+        try:
+            with open(pca_path, "rb") as f:
+                self.pca = pickle.load(f)
+        except (pickle.UnpicklingError, EOFError) as e:
+            raise ValueError(f"Corrupted PCA model file {pca_path}: {e}")
+        except Exception as e:
+            raise ValueError(f"Failed to load PCA model {pca_path}: {e}")
         print(f"✅ Loaded PCA model: {pca_path}")
 
         # Load Predictor
         predictor_path = self.models_dir / f"predictor_{persona_name}.pt"
         if not predictor_path.exists():
             raise FileNotFoundError(f"Predictor not found: {predictor_path}")
-        self.predictor = PredictorTrainer.load(str(predictor_path))
-        print(f"✅ Loaded Predictor model: {predictor_path}")
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+        self.predictor = PredictorTrainer.load(str(predictor_path), device=device)
+        print(f"✅ Loaded Predictor model: {predictor_path} (device: {device})")
+
+        # Validate dimension consistency
+        pca_output_dim = self.pca.n_components_
+        predictor_input_dim = self.predictor.latent_dim
+        if pca_output_dim != predictor_input_dim:
+            raise ValueError(
+                f"Dimension mismatch: PCA outputs {pca_output_dim}D but "
+                f"Predictor expects {predictor_input_dim}D. Models may be incompatible."
+            )
 
         # Pre-embed cards through PCA
         print(f"📚 Embedding {len(MAJOR_ARCANA)} major arcana cards...")

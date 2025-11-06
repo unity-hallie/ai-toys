@@ -28,6 +28,16 @@ from sentence_transformers import SentenceTransformer
 from toys.predictor_model import PredictorTrainer
 import logging
 
+# Global embedder cache - avoid reloading the same model for each persona
+_embedder_cache: Dict[str, SentenceTransformer] = {}
+
+
+def get_embedder(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
+    """Get or create cached embedder instance."""
+    if model_name not in _embedder_cache:
+        _embedder_cache[model_name] = SentenceTransformer(model_name)
+    return _embedder_cache[model_name]
+
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 
 
@@ -91,7 +101,7 @@ class Magic8Ball:
         """
         self.persona_name = persona_name
         self.models_dir = Path(models_dir)
-        self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        self.embedder = get_embedder("all-MiniLM-L6-v2")
 
         # Load PCA
         pca_path = self.models_dir / f"pca_{persona_name}.pkl"
@@ -105,8 +115,18 @@ class Magic8Ball:
         predictor_path = self.models_dir / f"predictor_{persona_name}.pt"
         if not predictor_path.exists():
             raise FileNotFoundError(f"Predictor not found: {predictor_path}")
-        self.predictor = PredictorTrainer.load(str(predictor_path))
-        print(f"✅ Loaded Predictor model: {predictor_path}")
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+        self.predictor = PredictorTrainer.load(str(predictor_path), device=device)
+        print(f"✅ Loaded Predictor model: {predictor_path} (device: {device})")
+
+        # Validate dimension consistency
+        pca_output_dim = self.pca.n_components_
+        predictor_input_dim = self.predictor.latent_dim
+        if pca_output_dim != predictor_input_dim:
+            raise ValueError(
+                f"Dimension mismatch: PCA outputs {pca_output_dim}D but "
+                f"Predictor expects {predictor_input_dim}D. Models may be incompatible."
+            )
 
         # Pre-embed responses through PCA
         print(f"📚 Embedding {len(self.RESPONSES)} response options...")
