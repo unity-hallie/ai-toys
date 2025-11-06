@@ -23,7 +23,7 @@ import pickle
 import numpy as np
 import torch
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 from sentence_transformers import SentenceTransformer
 from toys.predictor_model import PredictorTrainer
 import logging
