@@ -103,23 +103,42 @@ class Magic8Ball:
         self.models_dir = Path(models_dir)
         self.embedder = get_embedder("all-MiniLM-L6-v2")
 
-        # Load PCA
+        self.pca = self._load_pca_model(persona_name)
+        self.predictor = self._load_predictor_model(persona_name)
+        self._validate_model_compatibility()
+        self.response_vectors_24d = self._precompute_response_embeddings()
+
+    def _load_pca_model(self, persona_name: str):
+        """Load and validate PCA model from disk."""
         pca_path = self.models_dir / f"pca_{persona_name}.pkl"
         if not pca_path.exists():
             raise FileNotFoundError(f"PCA model not found: {pca_path}")
         with open(pca_path, "rb") as f:
-            self.pca = pickle.load(f)
+            pca = pickle.load(f)
         print(f"✅ Loaded PCA model: {pca_path}")
+        return pca
 
-        # Load Predictor
+    def _load_predictor_model(self, persona_name: str):
+        """Load predictor model with automatic device detection."""
         predictor_path = self.models_dir / f"predictor_{persona_name}.pt"
         if not predictor_path.exists():
             raise FileNotFoundError(f"Predictor not found: {predictor_path}")
-        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-        self.predictor = PredictorTrainer.load(str(predictor_path), device=device)
+        device = self._detect_device()
+        predictor = PredictorTrainer.load(str(predictor_path), device=device)
         print(f"✅ Loaded Predictor model: {predictor_path} (device: {device})")
+        return predictor
 
-        # Validate dimension consistency
+    def _detect_device(self) -> str:
+        """Detect available compute device: CUDA > MPS > CPU."""
+        if torch.cuda.is_available():
+            return "cuda"
+        elif torch.backends.mps.is_available():
+            return "mps"
+        else:
+            return "cpu"
+
+    def _validate_model_compatibility(self) -> None:
+        """Ensure PCA output dimension matches predictor input dimension."""
         pca_output_dim = self.pca.n_components_
         predictor_input_dim = self.predictor.latent_dim
         if pca_output_dim != predictor_input_dim:
@@ -128,158 +147,86 @@ class Magic8Ball:
                 f"Predictor expects {predictor_input_dim}D. Models may be incompatible."
             )
 
-        # Pre-embed responses through PCA
+    def _precompute_response_embeddings(self) -> np.ndarray:
+        """Precompute all response vectors in latent space."""
         print(f"📚 Embedding {len(self.RESPONSES)} response options...")
         response_embeddings_384d = self.embedder.encode(
             self.RESPONSES, convert_to_numpy=True
         )
-        self.response_vectors_24d = self.pca.transform(response_embeddings_384d)
-        print(f"   Shape: {self.response_vectors_24d.shape}")
+        response_vectors_24d = self.pca.transform(response_embeddings_384d)
+        print(f"   Shape: {response_vectors_24d.shape}")
+        return response_vectors_24d
+
+    def _compute_cosine_similarity(
+        self, vector_a: np.ndarray, vector_b: np.ndarray
+    ) -> float:
+        """Compute cosine similarity between two vectors."""
+        dot_product = np.dot(vector_a, vector_b)
+        norm_a = np.linalg.norm(vector_a)
+        norm_b = np.linalg.norm(vector_b)
+        # Add small epsilon to prevent division by zero
+        return dot_product / (norm_a * norm_b + 1e-8)
+
+    def _rank_responses_by_similarity(
+        self, predicted_vector: np.ndarray
+    ) -> list:
+        """Score and rank all responses by similarity to predicted vector."""
+        similarities = {}
+        for i, response_text in enumerate(self.RESPONSES):
+            response_vector = self.response_vectors_24d[i]
+            similarity = self._compute_cosine_similarity(predicted_vector, response_vector)
+            similarities[response_text] = similarity
+
+        # Sort by similarity (descending)
+        return sorted(similarities.items(), key=lambda x: x[1], reverse=True)
 
     def _find_best_response(
         self, predicted_24d: np.ndarray
     ) -> Tuple[str, float, list]:
-        """Match predicted response to the 10 options.
-
-        THE PROBLEM:
-        ============
-
-        You have:
-        - predicted_24d: the network's prediction (24 numbers)
-        - 10 response options, each also 24 numbers
-
-        GOAL: Which of the 10 is closest to the prediction?
-
-        THE SOLUTION: Cosine Similarity
-        ===============================
-
-        Imagine two arrows in space:
-        - One points in the direction of predicted_24d
-        - One points in the direction of response_i
-
-        Cosine similarity measures the angle between them:
-        - Angle = 0°   (same direction)     → similarity = 1.0  (perfect match)
-        - Angle = 90°  (perpendicular)      → similarity = 0.0  (unrelated)
-        - Angle = 180° (opposite direction) → similarity = -1.0 (inverse)
-
-        FORMULA (math-free version):
-        ============================
-        similarity = (predicted · response) / (length_pred × length_resp)
-
-        Where:
-        - (predicted · response) = how much they point in same direction
-        - length = how far the arrow is from origin
-        - Division = normalize so result is between -1 and 1
-
-        WHY THIS METRIC?
-        ================
-        - Fast to compute
-        - Makes sense geometrically
-        - Works well for high-dimensional spaces
-        - Robust to magnitude (only direction matters)
-
-        PRACTICAL EXAMPLE:
-        ==================
-        If predicted_24d is "cautious + uncertain + wait"
-        And response "Yes, but proceed cautiously" is also "cautious + uncertain + yes"
-        Then similarity is high (0.35-0.55) because they point similar directions.
-
-        REAL ALGORITHM:
-        ===============
-        1. For each of 10 responses:
-           a. Calculate cosine similarity
-        2. Sort by similarity (highest first)
-        3. Return: best match, its score, and 2 alternatives
-        """
-        similarities = {}
-
-        for i, response_text in enumerate(self.RESPONSES):
-            response_24d = self.response_vectors_24d[i]
-
-            # Cosine similarity: (dot product) / (norms)
-            dot_product = np.dot(predicted_24d, response_24d)
-            pred_norm = np.linalg.norm(predicted_24d)
-            resp_norm = np.linalg.norm(response_24d)
-
-            # Epsilon (1e-8) prevents division by zero
-            similarity = dot_product / (pred_norm * resp_norm + 1e-8)
-            similarities[response_text] = similarity
-
-        # Sort by similarity (highest first)
-        sorted_responses = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
-        closest_response, closest_similarity = sorted_responses[0]
-        alternatives = [r for r, _ in sorted_responses[1:3]]
-
+        """Find best matching response and return alternatives."""
+        ranked_responses = self._rank_responses_by_similarity(predicted_24d)
+        closest_response, closest_similarity = ranked_responses[0]
+        alternatives = [response for response, _ in ranked_responses[1:3]]
         return closest_response, closest_similarity, alternatives
 
+    def _embed_question_to_384d(self, question_text: str) -> np.ndarray:
+        """Convert question text to 384-dimensional embedding."""
+        embedding = self.embedder.encode([question_text], convert_to_numpy=True)[0]
+        return embedding
+
+    def _project_to_latent_space(self, embedding_384d: np.ndarray) -> np.ndarray:
+        """Project embedding through PCA to 24D latent space."""
+        latent_vector = self.pca.transform([embedding_384d])[0]
+        return latent_vector
+
+    def _predict_response_vector(self, question_latent: np.ndarray) -> np.ndarray:
+        """Use predictor network to generate persona-specific response vector."""
+        response_vector = self.predictor.predict(question_latent)
+        return response_vector
+
+    def _match_to_response_option(
+        self, response_vector: np.ndarray
+    ) -> Tuple[str, float, list]:
+        """Find the best response option for the predicted vector."""
+        best_response, similarity, alternatives = self._find_best_response(
+            response_vector
+        )
+        return best_response, similarity, alternatives
+
     def consult(self, question_text: str) -> Dict:
-        """
-        Consult the magic 8 ball.
-
-        Args:
-            question_text: The question/proposal
-
-        Returns:
-            Dict with response, similarity, alternatives, persona
-
-        ❓ INFERENCE QUESTIONS:
-
-        1. The pipeline: embed → PCA project → predictor → match
-           - Is this the right order?
-           - Could we skip the predictor and just match question directly?
-           - Pro: Simpler, fewer moving parts
-           - Con: Loses persona-specific "next-step" information
-
-        2. Should we scale the predictor output?
-           - Currently: use as-is
-           - Alternative: normalize to unit norm before matching
-           - Does this change the rankings?
-
-        3. Cosine similarity has a 1e-8 epsilon. Why?
-           - To prevent division by zero?
-           - Should we use torch.nn.functional.cosine_similarity instead?
-           - Pro: More numerically stable
-           - Con: Different implementation, different results
-
-        4. Should we return confidence scores?
-           - Currently: similarity is [0..1] range
-           - Alternative: convert to probability (softmax)?
-           - Alternative: confidence = (max - second_max) / max?
-           - Pro: More informative about decision confidence
-
-        5. How many alternatives should we return?
-           - Currently: hardcoded top 3
-           - Should this be configurable?
-           - Should we only return if gap is small?
-
-        6. Should we cache the predicted response?
-           - Currently: compute fresh each time
-           - For same question asked twice: redundant computation?
-           - Con: Memory overhead, invalidation issues
-
-        7. Should question preprocessing happen?
-           - Currently: raw text
-           - Alternative: lowercase, remove punctuation, normalize
-           - Does normalization help or hurt persona-specific encoding?
-        """
-        # Embed question to 384D
-        question_384d = self.embedder.encode([question_text], convert_to_numpy=True)[0]
-
-        # Project through PCA to 24D
-        question_24d = self.pca.transform([question_384d])[0]
-
-        # Predict response through predictor
-        predicted_response_24d = self.predictor.predict(question_24d)
-
-        # Find the closest response
-        closest_response, closest_similarity, alternatives = self._find_best_response(
-            predicted_response_24d
+        """Consult the oracle and return a response."""
+        # Pipeline: embed → project → predict → match
+        question_embedding = self._embed_question_to_384d(question_text)
+        question_latent = self._project_to_latent_space(question_embedding)
+        response_vector = self._predict_response_vector(question_latent)
+        best_response, similarity, alternatives = self._match_to_response_option(
+            response_vector
         )
 
         return {
             "question": question_text,
-            "response": closest_response,
-            "similarity": closest_similarity,
+            "response": best_response,
+            "similarity": similarity,
             "alternatives": alternatives,
             "persona": self.persona_name,
         }

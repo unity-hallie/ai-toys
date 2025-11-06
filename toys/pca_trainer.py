@@ -201,29 +201,39 @@ class PCATrainer:
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Read and split
+        chunks = self._read_and_chunk_text(text_path)
+        embeddings = self._embed_chunks_to_384d(chunks)
+        self._fit_pca_model(embeddings)
+        self._save_pca_to_disk(output_path)
+
+        return output_path
+
+    def _read_and_chunk_text(self, text_path: Path) -> list:
+        """Read text file and split into semantic chunks."""
         print(f"📖 Reading {text_path}...")
         with open(text_path) as f:
             text = f.read()
-
         chunks = self._split_into_chunks(text)
         print(f"📝 Split into {len(chunks)} chunks")
+        return chunks
 
-        # Embed
+    def _embed_chunks_to_384d(self, chunks: list) -> np.ndarray:
+        """Convert chunks to 384-dimensional embeddings."""
         print(f"🧠 Embedding {len(chunks)} chunks to 384D...")
         embeddings = self.embedder.encode(chunks, convert_to_numpy=True)
         print(f"   Shape: {embeddings.shape}")
+        return embeddings
 
-        # Fit PCA
-        print(f"🔄 Fitting PCA to {self.output_dim}D (Leech lattice)...")
+    def _fit_pca_model(self, embeddings: np.ndarray) -> None:
+        """Train PCA to project from 384D to latent dimensions."""
+        print(f"🔄 Fitting PCA to {self.output_dim}D...")
         self._fit_and_explain_pca(embeddings)
 
-        # Save
+    def _save_pca_to_disk(self, output_path: Path) -> None:
+        """Persist PCA model to pickle file."""
         with open(output_path, "wb") as f:
             pickle.dump(self.pca, f)
         print(f"💾 Saved to {output_path}")
-
-        return output_path
 
     def project(self, embedding: np.ndarray) -> np.ndarray:
         """Project a 384D embedding through PCA to 24D.

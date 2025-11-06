@@ -72,28 +72,47 @@ class TarotReader:
         self.models_dir = Path(models_dir)
         self.embedder = get_embedder("all-MiniLM-L6-v2")
 
-        # Load PCA
+        self.pca = self._load_pca_model(persona_name)
+        self.predictor = self._load_predictor_model(persona_name)
+        self._validate_model_compatibility()
+        self.card_vectors_24d = self._precompute_card_embeddings()
+
+    def _load_pca_model(self, persona_name: str):
+        """Load and validate PCA model from disk."""
         pca_path = self.models_dir / f"pca_{persona_name}.pkl"
         if not pca_path.exists():
             raise FileNotFoundError(f"PCA model not found: {pca_path}")
         try:
             with open(pca_path, "rb") as f:
-                self.pca = pickle.load(f)
+                pca = pickle.load(f)
         except (pickle.UnpicklingError, EOFError) as e:
             raise ValueError(f"Corrupted PCA model file {pca_path}: {e}")
         except Exception as e:
             raise ValueError(f"Failed to load PCA model {pca_path}: {e}")
         print(f"✅ Loaded PCA model: {pca_path}")
+        return pca
 
-        # Load Predictor
+    def _load_predictor_model(self, persona_name: str):
+        """Load predictor model with automatic device detection."""
         predictor_path = self.models_dir / f"predictor_{persona_name}.pt"
         if not predictor_path.exists():
             raise FileNotFoundError(f"Predictor not found: {predictor_path}")
-        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-        self.predictor = PredictorTrainer.load(str(predictor_path), device=device)
+        device = self._detect_device()
+        predictor = PredictorTrainer.load(str(predictor_path), device=device)
         print(f"✅ Loaded Predictor model: {predictor_path} (device: {device})")
+        return predictor
 
-        # Validate dimension consistency
+    def _detect_device(self) -> str:
+        """Detect available compute device: CUDA > MPS > CPU."""
+        if torch.cuda.is_available():
+            return "cuda"
+        elif torch.backends.mps.is_available():
+            return "mps"
+        else:
+            return "cpu"
+
+    def _validate_model_compatibility(self) -> None:
+        """Ensure PCA output dimension matches predictor input dimension."""
         pca_output_dim = self.pca.n_components_
         predictor_input_dim = self.predictor.latent_dim
         if pca_output_dim != predictor_input_dim:
@@ -102,13 +121,15 @@ class TarotReader:
                 f"Predictor expects {predictor_input_dim}D. Models may be incompatible."
             )
 
-        # Pre-embed cards through PCA
+    def _precompute_card_embeddings(self) -> np.ndarray:
+        """Precompute all major arcana card vectors in latent space."""
         print(f"📚 Embedding {len(MAJOR_ARCANA)} major arcana cards...")
         card_embeddings_384d = self.embedder.encode(
             MAJOR_ARCANA, convert_to_numpy=True
         )
-        self.card_vectors_24d = self.pca.transform(card_embeddings_384d)
-        print(f"   Shape: {self.card_vectors_24d.shape}")
+        card_vectors_24d = self.pca.transform(card_embeddings_384d)
+        print(f"   Shape: {card_vectors_24d.shape}")
+        return card_vectors_24d
 
     def _embed_question_with_time(self, question_text: str) -> np.ndarray:
         """
