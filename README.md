@@ -11,7 +11,7 @@ Each persona (text source) learns:
    - Trained to predict chunk_i+1 from chunk_i in latent space
    - Cheap, fast, interpretable
 
-## The Eleven Personas
+## The Twelve Personas
 
 **Romantic/Gothic:**
 - **Velveteen Rabbit** (Margery Williams) - Love, becoming real, tenderness
@@ -24,8 +24,9 @@ Each persona (text source) learns:
 - **Mrs. Dalloway** (Virginia Woolf) - Consciousness, interiority, time-flux
 - **The Great Gatsby** (F. Scott Fitzgerald) - Dreams, illusion, excess
 
-**Philosophical/Ludic:**
+**Philosophical/Political:**
 - **Meditations** (Marcus Aurelius) - Stoic acceptance, duty, inner peace
+- **Das Kapital** (Karl Marx) - Dialectics, labor, historical materialism, revolution
 - **Alice in Wonderland** (Lewis Carroll) - Logic, whimsy, nonsense
 - **Persuasion** (Jane Austen) - Social dynamics, restraint, delayed satisfaction
 - **Moby Dick** (Herman Melville) - Obsession, the sea, defiance
@@ -62,6 +63,7 @@ python -m toys.train_persona --text-path data/mrs_dalloway.txt --persona-name wo
 python -m toys.train_persona --text-path data/great_gatsby.txt --persona-name gatsby
 python -m toys.train_persona --text-path data/meditations.txt --persona-name marcus
 python -m toys.train_persona --text-path data/alice_wonderland.txt --persona-name alice
+python -m toys.train_persona --text-path data/das_kapital.txt --persona-name marx
 python -m toys.train_persona --text-path data/persuasion.txt --persona-name persuasion
 python -m toys.train_persona --text-path data/moby_dick.txt --persona-name moby
 ```
@@ -144,6 +146,7 @@ toys_models/
 ├── pca_woolf.pkl             ├── predictor_woolf.pt
 ├── pca_gatsby.pkl            ├── predictor_gatsby.pt
 ├── pca_marcus.pkl            ├── predictor_marcus.pt
+├── pca_marx.pkl              ├── predictor_marx.pt
 ├── pca_alice.pkl             ├── predictor_alice.pt
 ├── pca_persuasion.pkl        ├── predictor_persuasion.pt
 └── pca_moby.pkl              └── predictor_moby.pt
@@ -157,6 +160,7 @@ data/
 ├── mrs_dalloway.txt
 ├── great_gatsby.txt
 ├── meditations.txt
+├── das_kapital.txt
 ├── alice_wonderland.txt
 ├── persuasion.txt
 └── moby_dick.txt

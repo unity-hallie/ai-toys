@@ -54,6 +54,7 @@ if __name__ == "__main__":
         ("https://www.gutenberg.org/cache/epub/996/pg996.txt", "data/don_quixote.txt", "Don Quixote"),
         ("https://www.gutenberg.org/cache/epub/11/pg11.txt", "data/alice_wonderland.txt", "Alice in Wonderland"),
         ("https://www.gutenberg.org/cache/epub/2680/pg2680.txt", "data/meditations.txt", "Meditations"),
+        ("https://www.gutenberg.org/cache/epub/4572/pg4572.txt", "data/das_kapital.txt", "Das Kapital"),
     ]
 
     print("=" * 70)

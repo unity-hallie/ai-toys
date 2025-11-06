@@ -22,6 +22,7 @@ if __name__ == "__main__":
         ("data/don_quixote.txt", "quixote"),
         ("data/alice_wonderland.txt", "alice"),
         ("data/meditations.txt", "marcus"),
+        ("data/das_kapital.txt", "marx"),
     ]
 
     print("\n" + "=" * 70)

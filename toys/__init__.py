@@ -1,7 +1,7 @@
 """
 Toys - Lightweight decision oracles using PCA semantic projection + predictors.
 
-Eleven literary personas:
+Twelve literary + philosophical personas:
 - Velveteen Rabbit (love, becoming real)
 - Frankenstein (obsession, creation)
 - Jane Eyre (independence, passion)
@@ -10,6 +10,7 @@ Eleven literary personas:
 - Mrs. Dalloway (consciousness, interiority)
 - The Great Gatsby (dreams, illusion)
 - Meditations (stoic acceptance, duty)
+- Das Kapital (dialectics, labor, revolution)
 - Alice in Wonderland (logic, whimsy)
 - Persuasion (social dynamics, restraint)
 - Moby Dick (defiance, the sea)
