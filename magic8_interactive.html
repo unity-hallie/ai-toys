@@ -244,6 +244,50 @@
             color: #888;
             margin-top: 16px;
         }
+
+        .explanation-toggle {
+            background: #f5f3f0;
+            border: 1px solid #ccc;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 2px;
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+        }
+
+        .explanation-toggle:hover {
+            background: #efe9e0;
+        }
+
+        .explanation-content {
+            display: none;
+            margin-top: 12px;
+            padding: 15px;
+            background: #fefdfb;
+            border-left: 4px solid #8b6f47;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .explanation-content.open {
+            display: block;
+        }
+
+        .interpretation {
+            background: #fefdfb;
+            border-left: 4px solid #8b6f47;
+            padding: 20px;
+            margin: 25px 0;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .interpretation strong {
+            color: #222;
+        }
     </style>
 </head>
 <body>
@@ -263,10 +307,10 @@
             <div class="tools-grid">
                 <!-- TOOL 1: PERSONA COMPARISON -->
                 <div class="tool">
-                    <div class="tool-title">Persona Comparison</div>
+                    <div class="tool-title">Are Two Personas Actually Different?</div>
                     <p class="tool-description">
-                        Compare response preferences between two personas. See where they diverge, where they agree,
-                        and whether differences are statistically significant.
+                        Pick two personas. We'll compare their decision patterns and test whether their differences are real or just noise.
+                        This teaches you how to use statistics to compare models.
                     </p>
                     <div class="controls">
                         <div class="control-group">
@@ -309,10 +353,10 @@
 
                 <!-- TOOL 2: QUESTION SENSITIVITY -->
                 <div class="tool">
-                    <div class="tool-title">Question Drill-Down</div>
+                    <div class="tool-title">Which Questions Make Personas Disagree Most?</div>
                     <p class="tool-description">
-                        Pick a question to see which personas diverged most in their responses.
-                        See response distribution for that specific question.
+                        Pick a question. See how each persona answered it. Some questions create consensus; others spark disagreement.
+                        This reveals which questions are most diagnostic.
                     </p>
                     <div class="controls">
                         <div class="control-group">
@@ -334,10 +378,10 @@
 
                 <!-- TOOL 3: RESPONSE BIAS EXPLORER -->
                 <div class="tool">
-                    <div class="tool-title">Response Bias Explorer</div>
+                    <div class="tool-title">Which Personas Have Strong Biases?</div>
                     <p class="tool-description">
-                        Select a response to see which personas choose it, with what confidence,
-                        and on which questions.
+                        Pick a response (like "Yes, absolutely"). See which personas prefer it, how confidently, and when.
+                        This reveals model biases and personality quirks.
                     </p>
                     <div class="controls">
                         <div class="control-group">
@@ -360,10 +404,10 @@
 
                 <!-- TOOL 4: CONFIDENCE SLIDER -->
                 <div class="tool">
-                    <div class="tool-title">Confidence Threshold</div>
+                    <div class="tool-title">How Often Are Models Confident?</div>
                     <p class="tool-description">
-                        Filter all readings by confidence level. See how readings change as you raise the threshold.
-                        High threshold = only confident decisions. Low threshold = includes ambiguous ones.
+                        Drag the slider to filter by confidence. At high confidence, we only see clear decisions.
+                        At low confidence, we see ambiguous cases. What does this tell us about model certainty?
                     </p>
                     <div class="controls">
                         <div class="control-group">
@@ -503,6 +547,15 @@
         const SIGNIFICANCE_TESTS = {"alice|frankenstein": {"t_statistic": -2.025213160418581, "p_value": 0.06234948354957944, "cohens_d": -1.0126065802092905, "mean1": 0.43551670387387276, "mean2": 0.5625574663281441}, "alice|gatsby": {"t_statistic": -0.2184161939809302, "p_value": 0.8302566288308846, "cohens_d": -0.1092080969904651, "mean1": 0.43551670387387276, "mean2": 0.4493751171976328}, "alice|jane": {"t_statistic": 1.8921664798038698, "p_value": 0.07933405064111325, "cohens_d": 0.9460832399019351, "mean1": 0.43551670387387276, "mean2": 0.3324272111058235}, "alice|marcus": {"t_statistic": 2.32954166315462, "p_value": 0.03531252557872891, "cohens_d": 1.16477083157731, "mean1": 0.43551670387387276, "mean2": 0.2980014253407717}, "alice|marx": {"t_statistic": 1.3079084766071354, "p_value": 0.21197375810666158, "cohens_d": 0.6539542383035677, "mean1": 0.43551670387387276, "mean2": 0.30573838436976075}, "alice|moby": {"t_statistic": -0.5316811559398549, "p_value": 0.6032817520534519, "cohens_d": -0.26584057796992744, "mean1": 0.43551670387387276, "mean2": 0.4690568968653679}, "alice|persuasion": {"t_statistic": -4.138280366647987, "p_value": 0.001004246793000417, "cohens_d": -2.0691401833239933, "mean1": 0.43551670387387276, "mean2": 0.660628043115139}, "alice|quixote": {"t_statistic": 2.1591371028395416, "p_value": 0.04868093861429373, "cohens_d": 1.0795685514197708, "mean1": 0.43551670387387276, "mean2": 0.2779799047857523}, "alice|velveteen": {"t_statistic": 0.9483591919938901, "p_value": 0.35903060865037606, "cohens_d": 0.4741795959969449, "mean1": 0.43551670387387276, "mean2": 0.33792081277351826}, "alice|waste_land": {"t_statistic": 0.04269472932960883, "p_value": 0.9665478311429025, "cohens_d": 0.021347364664804414, "mean1": 0.43551670387387276, "mean2": 0.4327518567442894}, "alice|woolf": {"t_statistic": 2.2703579339709905, "p_value": 0.039506074261689304, "cohens_d": 1.135178966985495, "mean1": 0.43551670387387276, "mean2": 0.24031939916312695}, "frankenstein|gatsby": {"t_statistic": 2.2209149872888063, "p_value": 0.043364256305349215, "cohens_d": 1.110457493644403, "mean1": 0.5625574663281441, "mean2": 0.4493751171976328}, "frankenstein|jane": {"t_statistic": 5.8650289827376625, "p_value": 4.110087548164981e-05, "cohens_d": 2.9325144913688312, "mean1": 0.5625574663281441, "mean2": 0.3324272111058235}, "frankenstein|marcus": {"t_statistic": 5.834610584867963, "p_value": 4.333503972630034e-05, "cohens_d": 2.9173052924339813, "mean1": 0.5625574663281441, "mean2": 0.2980014253407717}, "frankenstein|marx": {"t_statistic": 2.7992865785410603, "p_value": 0.014200247504679615, "cohens_d": 1.3996432892705302, "mean1": 0.5625574663281441, "mean2": 0.30573838436976075}, "frankenstein|moby": {"t_statistic": 1.851303356152082, "p_value": 0.08533374083321821, "cohens_d": 0.925651678076041, "mean1": 0.5625574663281441, "mean2": 0.4690568968653679}, "frankenstein|persuasion": {"t_statistic": -2.5069372597258877, "p_value": 0.02512753615621804, "cohens_d": -1.2534686298629438, "mean1": 0.5625574663281441, "mean2": 0.660628043115139}, "frankenstein|quixote": {"t_statistic": 4.559894403256642, "p_value": 0.0004452131615505976, "cohens_d": 2.279947201628321, "mean1": 0.5625574663281441, "mean2": 0.2779799047857523}, "frankenstein|velveteen": {"t_statistic": 2.3468760199368917, "p_value": 0.034166232832033364, "cohens_d": 1.1734380099684456, "mean1": 0.5625574663281441, "mean2": 0.33792081277351826}, "frankenstein|waste_land": {"t_statistic": 2.4685965736810513, "p_value": 0.027057442418348558, "cohens_d": 1.2342982868405257, "mean1": 0.5625574663281441, "mean2": 0.4327518567442894}, "frankenstein|woolf": {"t_statistic": 4.172881452252339, "p_value": 0.0009387848444734048, "cohens_d": 2.0864407261261695, "mean1": 0.5625574663281441, "mean2": 0.24031939916312695}, "gatsby|jane": {"t_statistic": 2.896271919455578, "p_value": 0.011728130287651106, "cohens_d": 1.448135959727789, "mean1": 0.4493751171976328, "mean2": 0.3324272111058235}, "gatsby|marcus": {"t_statistic": 3.2670459990275686, "p_value": 0.005618881030491818, "cohens_d": 1.6335229995137843, "mean1": 0.4493751171976328, "mean2": 0.2980014253407717}, "gatsby|marx": {"t_statistic": 1.5572358890689308, "p_value": 0.14172688416619264, "cohens_d": 0.7786179445344654, "mean1": 0.4493751171976328, "mean2": 0.30573838436976075}, "gatsby|moby": {"t_statistic": -0.3829379144349254, "p_value": 0.7075172001101007, "cohens_d": -0.1914689572174627, "mean1": 0.4493751171976328, "mean2": 0.4690568968653679}, "gatsby|persuasion": {"t_statistic": -5.246682726813656, "p_value": 0.00012359182063599692, "cohens_d": -2.623341363406828, "mean1": 0.4493751171976328, "mean2": 0.660628043115139}, "gatsby|quixote": {"t_statistic": 2.714850995415451, "p_value": 0.016761809081423634, "cohens_d": 1.3574254977077258, "mean1": 0.4493751171976328, "mean2": 0.2779799047857523}, "gatsby|velveteen": {"t_statistic": 1.1586806494312305, "p_value": 0.26596946220769435, "cohens_d": 0.5793403247156151, "mean1": 0.4493751171976328, "mean2": 0.33792081277351826}, "gatsby|waste_land": {"t_statistic": 0.31106614829805757, "p_value": 0.7603337648407466, "cohens_d": 0.15553307414902878, "mean1": 0.4493751171976328, "mean2": 0.4327518567442894}, "gatsby|woolf": {"t_statistic": 2.6868166110084495, "p_value": 0.017707794886807845, "cohens_d": 1.3434083055042245, "mean1": 0.4493751171976328, "mean2": 0.24031939916312695}, "jane|marcus": {"t_statistic": 1.043080263685122, "p_value": 0.31458904131021975, "cohens_d": 0.521540131842561, "mean1": 0.3324272111058235, "mean2": 0.2980014253407717}, "jane|marx": {"t_statistic": 0.3092008661648259, "p_value": 0.7617225487475056, "cohens_d": 0.15460043308241292, "mean1": 0.3324272111058235, "mean2": 0.30573838436976075}, "jane|moby": {"t_statistic": -3.432843662552797, "p_value": 0.004040156494258264, "cohens_d": -1.7164218312763986, "mean1": 0.3324272111058235, "mean2": 0.4690568968653679}, "jane|persuasion": {"t_statistic": -13.823849696893827, "p_value": 1.4916429406142076e-09, "cohens_d": -6.911924848446914, "mean1": 0.3324272111058235, "mean2": 0.660628043115139}, "jane|quixote": {"t_statistic": 1.0061850765278926, "p_value": 0.331401446009451, "cohens_d": 0.5030925382639464, "mean1": 0.3324272111058235, "mean2": 0.2779799047857523}, "jane|velveteen": {"t_statistic": -0.06068474481811932, "p_value": 0.9524680767398702, "cohens_d": -0.03034237240905966, "mean1": 0.3324272111058235, "mean2": 0.33792081277351826}, "jane|waste_land": {"t_statistic": -2.3658167767604357, "p_value": 0.03295403713471611, "cohens_d": -1.1829083883802178, "mean1": 0.3324272111058235, "mean2": 0.4327518567442894}, "jane|woolf": {"t_statistic": 1.303051233140777, "p_value": 0.2135822064037138, "cohens_d": 0.6515256165703884, "mean1": 0.3324272111058235, "mean2": 0.24031939916312695}, "marcus|marx": {"t_statistic": -0.08668235376298358, "p_value": 0.9321515793686518, "cohens_d": -0.04334117688149179, "mean1": 0.2980014253407717, "mean2": 0.30573838436976075}, "marcus|moby": {"t_statistic": -3.7323396202202477, "p_value": 0.002229931760777819, "cohens_d": -1.8661698101101238, "mean1": 0.2980014253407717, "mean2": 0.4690568968653679}, "marcus|persuasion": {"t_statistic": -11.034306390256825, "p_value": 2.7244120368384774e-08, "cohens_d": -5.5171531951284125, "mean1": 0.2980014253407717, "mean2": 0.660628043115139}, "marcus|quixote": {"t_statistic": 0.34113986888056036, "p_value": 0.7380640182000564, "cohens_d": 0.1705699344402802, "mean1": 0.2980014253407717, "mean2": 0.2779799047857523}, "marcus|velveteen": {"t_statistic": -0.42769897285881486, "p_value": 0.675376030606622, "cohens_d": -0.21384948642940738, "mean1": 0.2980014253407717, "mean2": 0.33792081277351826}, "marcus|waste_land": {"t_statistic": -2.8008585881878316, "p_value": 0.014156379123036682, "cohens_d": -1.4004292940939158, "mean1": 0.2980014253407717, "mean2": 0.4327518567442894}, "marcus|woolf": {"t_statistic": 0.7768741040285092, "p_value": 0.45016074545027995, "cohens_d": 0.38843705201425455, "mean1": 0.2980014253407717, "mean2": 0.24031939916312695}, "marx|moby": {"t_statistic": -1.7754582111298758, "p_value": 0.09755538086319346, "cohens_d": -0.8877291055649379, "mean1": 0.30573838436976075, "mean2": 0.4690568968653679}, "marx|persuasion": {"t_statistic": -4.114094599293562, "p_value": 0.0010527612604958553, "cohens_d": -2.057047299646781, "mean1": 0.30573838436976075, "mean2": 0.660628043115139}, "marx|quixote": {"t_statistic": 0.28032252173661015, "p_value": 0.7833296939188866, "cohens_d": 0.14016126086830508, "mean1": 0.30573838436976075, "mean2": 0.2779799047857523}, "marx|velveteen": {"t_statistic": -0.2621350797740299, "p_value": 0.7970349291474047, "cohens_d": -0.13106753988701492, "mean1": 0.30573838436976075, "mean2": 0.33792081277351826}, "marx|waste_land": {"t_statistic": -1.3636319624738724, "p_value": 0.1942092636358739, "cohens_d": -0.6818159812369361, "mean1": 0.30573838436976075, "mean2": 0.4327518567442894}, "marx|woolf": {"t_statistic": 0.600351097677047, "p_value": 0.5578661415928697, "cohens_d": 0.3001755488385235, "mean1": 0.30573838436976075, "mean2": 0.24031939916312695}, "moby|persuasion": {"t_statistic": -4.827368865754933, "p_value": 0.0002684106342632939, "cohens_d": -2.4136844328774667, "mean1": 0.4690568968653679, "mean2": 0.660628043115139}, "moby|quixote": {"t_statistic": 3.0443569013294534, "p_value": 0.008747198471966939, "cohens_d": 1.5221784506647267, "mean1": 0.4690568968653679, "mean2": 0.2779799047857523}, "moby|velveteen": {"t_statistic": 1.3667200242848905, "p_value": 0.19326127532425738, "cohens_d": 0.6833600121424451, "mean1": 0.4690568968653679, "mean2": 0.33792081277351826}, "moby|waste_land": {"t_statistic": 0.6849462476524301, "p_value": 0.5045608073449148, "cohens_d": 0.34247312382621503, "mean1": 0.4690568968653679, "mean2": 0.4327518567442894}, "moby|woolf": {"t_statistic": 2.9510876693788277, "p_value": 0.010523211877190464, "cohens_d": 1.4755438346894139, "mean1": 0.4690568968653679, "mean2": 0.24031939916312695}, "persuasion|quixote": {"t_statistic": 7.082522751386024, "p_value": 5.485506251729978e-06, "cohens_d": 3.541261375693012, "mean1": 0.660628043115139, "mean2": 0.2779799047857523}, "persuasion|velveteen": {"t_statistic": 3.5667793609081846, "p_value": 0.003096036852678871, "cohens_d": 1.7833896804540923, "mean1": 0.660628043115139, "mean2": 0.33792081277351826}, "persuasion|waste_land": {"t_statistic": 5.38755894219872, "p_value": 9.57349999385002e-05, "cohens_d": 2.69377947109936, "mean1": 0.660628043115139, "mean2": 0.4327518567442894}, "persuasion|woolf": {"t_statistic": 5.951626037864213, "p_value": 3.537625732006798e-05, "cohens_d": 2.9758130189321057, "mean1": 0.660628043115139, "mean2": 0.24031939916312695}, "quixote|velveteen": {"t_statistic": -0.5835650144169431, "p_value": 0.5687960010125386, "cohens_d": -0.29178250720847154, "mean1": 0.2779799047857523, "mean2": 0.33792081277351826}, "quixote|waste_land": {"t_statistic": -2.4015071894553115, "p_value": 0.03077994285696141, "cohens_d": -1.2007535947276557, "mean1": 0.2779799047857523, "mean2": 0.4327518567442894}, "quixote|woolf": {"t_statistic": 0.43922702671489977, "p_value": 0.6672003857604287, "cohens_d": 0.21961351335744989, "mean1": 0.2779799047857523, "mean2": 0.24031939916312695}, "velveteen|waste_land": {"t_statistic": -0.9770443773971809, "p_value": 0.34512913267119505, "cohens_d": -0.4885221886985904, "mean1": 0.33792081277351826, "mean2": 0.4327518567442894}, "velveteen|woolf": {"t_statistic": 0.8688561873153996, "p_value": 0.39957622699321804, "cohens_d": 0.4344280936576998, "mean1": 0.33792081277351826, "mean2": 0.24031939916312695}, "waste_land|woolf": {"t_statistic": 2.439590681281339, "p_value": 0.0286108492678754, "cohens_d": 1.2197953406406692, "mean1": 0.4327518567442894, "mean2": 0.24031939916312695}};
         const PERSONA_QUESTION_CONFIDENCE = {"alice": {"Is this the right approach?": 0.1757160723209381, "Is this worth the effort?": 0.2821456789970398, "Should we commit to this?": 0.5090277791023254, "Should we deploy this immediately?": 0.5550709962844849, "Should we move forward?": 0.47821977734565735, "Should we take this chance?": 0.5388504266738892, "This needs more thought.": 0.5826046466827393, "This seems too risky.": 0.3624982535839081}, "frankenstein": {"Is this the right approach?": 0.3777061104774475, "Is this worth the effort?": 0.4915989339351654, "Should we commit to this?": 0.5918141007423401, "Should we deploy this immediately?": 0.6600710153579712, "Should we move forward?": 0.6319699287414551, "Should we take this chance?": 0.651868999004364, "This needs more thought.": 0.48700836300849915, "This seems too risky.": 0.6084222793579102}, "gatsby": {"Is this the right approach?": 0.5083638429641724, "Is this worth the effort?": 0.3667236566543579, "Should we commit to this?": 0.5684694051742554, "Should we deploy this immediately?": 0.24392597377300262, "Should we move forward?": 0.4131806194782257, "Should we take this chance?": 0.4975126385688782, "This needs more thought.": 0.5062563419342041, "This seems too risky.": 0.49056845903396606}, "jane": {"Is this the right approach?": 0.3655957877635956, "Is this worth the effort?": 0.3517969250679016, "Should we commit to this?": 0.4212875962257385, "Should we deploy this immediately?": 0.30417919158935547, "Should we move forward?": 0.3140139579772949, "Should we take this chance?": 0.3338705897331238, "This needs more thought.": 0.26305755972862244, "This seems too risky.": 0.3056160807609558}, "marcus": {"Is this the right approach?": 0.315324068069458, "Is this worth the effort?": 0.31827685236930847, "Should we commit to this?": 0.22799909114837646, "Should we deploy this immediately?": 0.2940117120742798, "Should we move forward?": 0.2352375090122223, "Should we take this chance?": 0.2403712421655655, "This needs more thought.": 0.27695232629776, "This seems too risky.": 0.4758386015892029}, "marx": {"Is this the right approach?": 0.3738788068294525, "Is this worth the effort?": 0.43814682960510254, "Should we commit to this?": -0.052329760044813156, "Should we deploy this immediately?": 0.35966625809669495, "Should we move forward?": 0.1450202614068985, "Should we take this chance?": 0.0394374281167984, "This needs more thought.": 0.6430245041847229, "This seems too risky.": 0.49906274676322937}, "moby": {"Is this the right approach?": 0.5342487692832947, "Is this worth the effort?": 0.4659898579120636, "Should we commit to this?": 0.4540722966194153, "Should we deploy this immediately?": 0.32510408759117126, "Should we move forward?": 0.6525043845176697, "Should we take this chance?": 0.5209138989448547, "This needs more thought.": 0.3721572756767273, "This seems too risky.": 0.4274646043777466}, "persuasion": {"Is this the right approach?": 0.6830553412437439, "Is this worth the effort?": 0.6690971851348877, "Should we commit to this?": 0.6788595914840698, "Should we deploy this immediately?": 0.6382915377616882, "Should we move forward?": 0.6709585785865784, "Should we take this chance?": 0.717278778553009, "This needs more thought.": 0.6703321933746338, "This seems too risky.": 0.5571511387825012}, "quixote": {"Is this the right approach?": 0.3267230689525604, "Is this worth the effort?": 0.5036545991897583, "Should we commit to this?": 0.303923100233078, "Should we deploy this immediately?": 0.2898736894130707, "Should we move forward?": 0.04100996255874634, "Should we take this chance?": 0.13734222948551178, "This needs more thought.": 0.22192198038101196, "This seems too risky.": 0.3993906080722809}, "velveteen": {"Is this the right approach?": 0.052438315004110336, "Is this worth the effort?": 0.7329687476158142, "Should we commit to this?": 0.4532671570777893, "Should we deploy this immediately?": 0.5479522943496704, "Should we move forward?": -0.008102145977318287, "Should we take this chance?": 0.18381111323833466, "This needs more thought.": 0.40440836548805237, "This seems too risky.": 0.3366226553916931}, "waste_land": {"Is this the right approach?": 0.5278818011283875, "Is this worth the effort?": 0.5294367074966431, "Should we commit to this?": 0.2587297856807709, "Should we deploy this immediately?": 0.49214768409729004, "Should we move forward?": 0.3218116760253906, "Should we take this chance?": 0.3295353353023529, "This needs more thought.": 0.49380648136138916, "This seems too risky.": 0.5086653828620911}, "woolf": {"Is this the right approach?": 0.058045826852321625, "Is this worth the effort?": 0.30867263674736023, "Should we commit to this?": 0.5813072323799133, "Should we deploy this immediately?": 0.3587200343608856, "Should we move forward?": 0.3184201121330261, "Should we take this chance?": 0.2397385984659195, "This needs more thought.": 0.025800257921218872, "This seems too risky.": 0.03185049444437027}};
 
+        // Toggle explanation visibility
+        function toggleExplanation(element) {
+            const explanation = element.nextElementSibling;
+            if (explanation && explanation.classList.contains('explanation-content')) {
+                explanation.classList.toggle('open');
+                element.textContent = explanation.classList.contains('open') ? 'Hide explanation' : 'Show explanation';
+            }
+        }
+
         // Helper: group data
         function groupBy(arr, key) {
             const result = {};
@@ -546,11 +599,36 @@
             const sig = SIGNIFICANCE_TESTS[key];
             if (sig) {
                 const pClass = sig.p_value < 0.05 ? 'significant' : 'not-significant';
-                html += '<p style="margin-top: 20px;"><strong>Statistical Test:</strong></p>';
-                html += '<p>t-statistic: ' + sig.t_statistic.toFixed(3) + '</p>';
-                html += '<p class="' + pClass + '">p-value: ' + sig.p_value.toFixed(4) + ' (' + 
-                    (sig.p_value < 0.05 ? 'SIGNIFICANT' : 'not significant') + ')</p>';
-                html += '<p>Cohen's d: ' + sig.cohens_d.toFixed(3) + ' (effect size)</p>';
+                const isSignificant = sig.p_value < 0.05;
+
+                html += '<div class="interpretation">';
+                html += '<strong>What This Means:</strong><br>';
+                if (isSignificant) {
+                    html += p1 + ' and ' + p2 + ' make <strong>fundamentally different decisions</strong>. ';
+                    html += 'If they were identical, we&rsquo;d see this difference only ' + (sig.p_value * 100).toFixed(1) + '% of the time. ';
+                    html += 'The effect size (Cohen&rsquo;s d = ' + sig.cohens_d.toFixed(2) + ') is ' +
+                        (Math.abs(sig.cohens_d) > 0.8 ? '<strong>large</strong>' : Math.abs(sig.cohens_d) > 0.2 ? '<strong>medium</strong>' : '<strong>small</strong>') + '.';
+                } else {
+                    html += 'The differences between ' + p1 + ' and ' + p2 + ' are <strong>not statistically significant</strong>. ';
+                    html += 'They might just be due to chance. More data might reveal real differences, or they might be truly similar.';
+                }
+                html += '</div>';
+
+                html += '<p style="margin-top: 20px;"><strong>Statistical Details:</strong> ';
+                html += '<span class="explanation-toggle" onclick="toggleExplanation(this)">Show p-value explanation</span></p>';
+                html += '<div class="explanation-content">';
+                html += '<strong>What is p-value?</strong> If these two personas were actually identical, what&rsquo;s the probability we&rsquo;d see differences this large by pure chance? ';
+                html += 'If p &lt; 0.05, we conclude the difference is real, not random noise.';
+                html += '</div>';
+
+                html += '<p><strong>t-statistic:</strong> ' + sig.t_statistic.toFixed(3) + ' | ';
+                html += '<strong>p-value:</strong> <span class="' + pClass + '">' + sig.p_value.toFixed(4) + '</span> | ';
+                html += '<strong>Cohen&rsquo;s d:</strong> ' + sig.cohens_d.toFixed(3) + ' ';
+                html += '<span class="explanation-toggle" onclick="toggleExplanation(this)">What&rsquo;s this?</span>';
+                html += '<div class="explanation-content">';
+                html += '<strong>Cohen&rsquo;s d (effect size):</strong> How big is the difference? &lt;0.2 = tiny, 0.2–0.8 = medium, &gt;0.8 = large. ';
+                html += 'A small p-value with small d means: real but tiny difference. Large d means: substantial difference.';
+                html += '</div></p>';
             }
 
             html += '</div>';
@@ -728,7 +806,7 @@
                 
                 html += '<p><strong>t-statistic:</strong> ' + sig.t_statistic.toFixed(4) + '</p>';
                 html += '<p><strong>p-value:</strong> <span class="' + dClass + '">' + sig.p_value.toFixed(4) + '</span></p>';
-                html += '<p><strong>Cohen's d:</strong> ' + sig.cohens_d.toFixed(3);
+                html += '<p><strong>Cohen&rsquo;s d:</strong> ' + sig.cohens_d.toFixed(3);
                 if (Math.abs(sig.cohens_d) > 0.8) html += ' (large effect)';
                 else if (Math.abs(sig.cohens_d) > 0.2) html += ' (medium effect)';
                 else html += ' (small effect)';
