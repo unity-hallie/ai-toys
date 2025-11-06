@@ -1,6 +1,6 @@
-# How Toys Works: A Gentle Explanation
+# How Toys Works
 
-This guide explains the core concepts without math trauma.
+This guide explains the pipeline and key concepts.
 
 ## The Big Picture
 
@@ -30,29 +30,12 @@ Each step is explained below.
 
 **What's happening:**
 
-You have text. Computers can't think with words; they think with numbers.
-
-SentenceTransformers converts:
+Text is converted to 384-dimensional vectors using SentenceTransformers, a pre-trained model:
 ```
 "Should I wait?" → [0.23, -0.51, 0.12, 0.44, ..., 0.89]  (384 numbers)
 ```
 
-**How does it work?**
-
-SentenceTransformers is pre-trained on billions of sentences. It learned:
-- Words with similar meaning get similar number patterns
-- "wait" and "pause" are close together
-- "wait" and "run" are far apart
-
-**Why 384 numbers?**
-
-That's just what the model outputs. Think of it as 384 different "aspects" of meaning:
-- Aspect 1: Is this positive or negative? (value: 0.5 = slightly positive)
-- Aspect 2: Is this about time? (value: 0.8 = very time-focused)
-- Aspect 3: Is this about action? (value: -0.2 = not very action-focused)
-- ... (381 more aspects)
-
-These aspects aren't human-readable. But together they capture the meaning.
+SentenceTransformers learned from billions of sentences to map semantically similar phrases to nearby vectors. The 384 dimensions capture various aspects of meaning, though they're not individually interpretable. Together, they form a dense representation of semantic content.
 
 ---
 
@@ -60,109 +43,74 @@ These aspects aren't human-readable. But together they capture the meaning.
 
 **What's happening:**
 
-Your book is thousands of sentences. That's too much. We split it into roughly 100-word chunks.
+The text is split into ~100-word chunks. Each chunk is independently embedded into a 384-dimensional vector:
 
 ```
 "It was the best of times, it was the worst of times, ..."
-    ↓ (split at periods, group by word count)
+    ↓
 Chunk 1: "It was the best of times, it was the worst of times"
 Chunk 2: "It was the age of wisdom, it was the age of foolishness"
-...
+    ↓
+Each becomes a 384D vector
 ```
 
-Each chunk becomes a 384-number vector (embedding).
+Chunking at sentence boundaries preserves semantic coherence while keeping individual vectors tractable.
 
 ---
 
-## Step 3: PCA (Compress Numbers)
+## Step 3: PCA (Dimensionality Reduction)
 
 **The Problem:**
 
-384 numbers per chunk is a lot. Storage, computation, training time.
+384 dimensions is high-dimensional and computationally expensive for training.
 
-**The Solution: PCA**
+**The Solution:**
 
-PCA finds the 24 most important "directions" in the number space.
-
-**Analogy:**
-
-Imagine a landscape photo:
-- Real world: infinite detail
-- Camera: captures essence in 2D
-
-PCA is like asking:
-- What 24 axes would capture the most variation in this data?
-- Like: "vertical" is important, "horizontal" is important, "brightness" is important
-- But "pixel 237" probably isn't important
-
-**Result:**
-
-384 numbers → 24 numbers (still keeping 90%+ of variation)
+PCA (Principal Component Analysis) projects the 384D vectors to 24D by keeping the principal components that explain 90%+ of variance. This is a standard dimensionality reduction technique that balances expressiveness with computational efficiency.
 
 **Why 24D?**
 
-The Leech lattice is a special 24-dimensional geometric structure. Maybe semantic space wants to be that efficient too? (It's a guess, but it works.)
+24 dimensions provides a good balance between expressiveness and computational efficiency. This specific dimensionality allows for future work exploring structural symmetries in semantic space.
 
 ---
 
-## Step 4: Teaching the Network (Predictor)
+## Step 4: Training the Predictor Network
 
 **The Goal:**
 
-We want a network that learns: "Given this chunk, what would come next?"
+Train a neural network to predict the next chunk's embedding given the current chunk. This forces the network to learn the book's semantic patterns and progression.
 
-This teaches it the book's semantic rhythm.
-
-**How it learns:**
+**Training Setup:**
 
 ```
-Training example:
-Input:  chunk_0 vector (24D)
-Output: chunk_1 vector (24D)  ← target
+For each training example:
+  Input:  chunk_i vector (24D)
+  Target: chunk_{i+1} vector (24D)
 
-Network tries: prediction_0 = network(chunk_0)
-Error: prediction_0 ≠ chunk_1
-Learn: adjust weights to reduce error
+The network minimizes prediction error over all consecutive pairs.
 ```
 
-Do this for thousands of examples. The network learns patterns:
-- In Austen: discussions of society → considerations of propriety
-- In Melville: obsession → more obsession (gets intense)
-- In Woolf: consciousness → fragmentation → consciousness
+This is a sequence-to-sequence learning task on the embedding space.
 
-**The Network Architecture:**
+**Architecture:**
 
 ```
 24D input
     ↓
-Expand to 48D (think about more aspects)
+48D hidden layer (ReLU activation)
     ↓
-ReLU (introduce nonlinearity: f(x) = max(0, x))
+24D hidden layer (ReLU activation)
     ↓
-Compress back to 24D
-    ↓
-ReLU again
-    ↓
-Output 24D (final prediction)
+24D output (predicted next embedding)
 ```
 
-Why this shape?
-- Expand: lets the network think creatively
-- ReLU: bends linearity so it can learn curved patterns
-- Compress: synthesize back to core concepts
-- Small size: (2,400 parameters) avoids memorization
+The network has ~2,400 parameters. A small architecture on limited data reduces overfitting and forces the network to learn general semantic patterns rather than memorizing.
 
-**Training process:**
+**Training:**
 
-```
-For 100 epochs (or until improvement stops):
-  For each mini-batch of 4 examples:
-    1. Predict: guess what comes next
-    2. Compute error: how wrong was I?
-    3. Learn: adjust weights to be less wrong
-```
-
-Early stopping: if the error stops improving for 15 epochs, we're done.
+- Epochs: up to 100 (early stopping if validation loss doesn't improve for 15 epochs)
+- Batch size: 4
+- Optimizer: standard SGD with gradient descent
 
 ---
 
@@ -170,19 +118,18 @@ Early stopping: if the error stops improving for 15 epochs, we're done.
 
 **Magic 8 Ball:**
 
-1. Embed question: "Should I wait?" → 384D vector
-2. Compress through PCA: → 24D vector
-3. Predict through network: → 24D "semantic response"
-4. Compare to 10 response options (also 24D)
-5. Find closest using cosine similarity (arrow angle)
-6. Return: "Revisit later"
+1. Embed the question: "Should I wait?" → 384D vector
+2. Compress via PCA: → 24D vector
+3. Pass through the trained network: → 24D predicted response vector
+4. Find the closest match among 10 response embeddings using cosine similarity
+5. Return that response
 
 **Tarot:**
 
-Same as above, but:
-- Compare to 22 major arcana cards (not 10 responses)
-- Use Euclidean distance (how close, not arrow angle)
-- Return: closest card(s)
+Same pipeline, but:
+- Compares against 22 major arcana card embeddings (instead of 10 responses)
+- Uses Euclidean distance for similarity (instead of cosine)
+- Returns the card(s) with minimum distance
 
 ---
 
@@ -228,17 +175,17 @@ This simple bend lets neural networks learn nonlinear patterns.
 
 ---
 
-## Key Insights
+## Key Design Decisions
 
-1. **Embeddings are learned patterns**: SentenceTransformers distilled 1 billion sentences into number recipes.
+1. **Pre-trained embeddings**: SentenceTransformers captures semantic relationships learned from billions of sentences. This avoids training embeddings from scratch.
 
-2. **PCA is compression**: Find the essential axes, discard noise.
+2. **Dimensionality reduction via PCA**: Reduces 384 → 24 dimensions while retaining 90%+ of variance. Trades a small amount of expressiveness for significant computational gains.
 
-3. **Sequence prediction teaches style**: If you learn chunk_i → chunk_i+1, you learn the book's semantic rhythm.
+3. **Sequence prediction as training signal**: Learning chunk_i → chunk_i+1 captures the statistical patterns of the text without explicit semantic annotation.
 
-4. **Small networks are better**: When training on small data, a small network is forced to learn patterns (not memorize).
+4. **Small network architecture**: ~2,400 parameters prevents overfitting on limited training data and encourages learning generalizable patterns.
 
-5. **Similarity/Distance are geometric**: In high-dimensional space, you can measure angles and distances like in 2D.
+5. **Similarity in reduced space**: Both cosine similarity (angle) and Euclidean distance (point distance) work as matching metrics in the PCA-projected space.
 
 ---
 
@@ -246,49 +193,36 @@ This simple bend lets neural networks learn nonlinear patterns.
 
 **Q: Is this machine learning?**
 
-A: Yes. It uses neural networks, embeddings, and dimensionality reduction. But the concepts are simpler than most deep learning.
+A: Yes. It combines embeddings, dimensionality reduction, and neural networks.
 
 **Q: Why does it work?**
 
-A: Because text naturally has semantic structure. Similar ideas tend to follow each other. The network just learns those patterns.
+A: Text has statistical structure—similar concepts tend to appear near each other. The network learns this structure via sequence prediction.
 
-**Q: Is this sentient?**
+**Q: Is this actually learning the book's voice?**
 
-A: No. It's learned to complete patterns. It doesn't understand meaning the way you do.
+A: To a degree. The network learns statistical patterns in how concepts flow within the text. Whether that constitutes "voice" is subjective.
 
-**Q: Can I train on my own texts?**
+**Q: Can I train on my own text?**
 
-A: Yes! Run:
+A: Yes:
 
 ```bash
 python -m toys.train_persona --text-path mytext.txt --persona-name myvoice
 python -m toys.magic_8_ball
 ```
 
-**Q: Why Leech lattice?**
+**Q: Why 24D?**
 
-A: It's the densest sphere packing in 24D. Maybe semantic space wants to be that efficient. (It's a hunch, not proven.)
-
----
-
-## For the Mathematically Curious
-
-All the math is in the docstrings. Each method has:
-1. Plain-language explanation
-2. Intuitive analogy
-3. The actual formula (if interested)
-
-Look for docstrings marked with:
-- "WHAT'S HAPPENING:" (start here)
-- "THE MATH (if you're curious):" (optional)
+A: It's a practical choice that balances model capacity with computational efficiency. Future work may explore whether semantic space exhibits lattice-like symmetries at this dimensionality.
 
 ---
 
-## Files to Read
+## Implementation Details
 
-- `toys/pca_trainer.py` - How to compress 384D → 24D
-- `toys/predictor_model.py` - How the network learns
-- `toys/magic_8_ball.py` - How to match questions to responses
-- `toys/tarot.py` - How to find semantic cards
+The codebase has detailed docstrings. Key files:
 
-All have detailed docstrings explaining the "why" as well as the "what".
+- `toys/pca_trainer.py` - PCA dimensionality reduction
+- `toys/predictor_model.py` - Neural network training and inference
+- `toys/magic_8_ball.py` - Question-to-response matching via similarity
+- `toys/tarot.py` - Card selection using distance metrics
