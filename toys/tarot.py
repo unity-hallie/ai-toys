@@ -122,6 +122,48 @@ class TarotReader:
 
         Returns:
             List of card names
+
+        ❓ TAROT DESIGN QUESTIONS:
+
+        1. Temporal context: why include time?
+           - Currently: add hour and day-of-week to question
+           - Intuition: when you ask matters
+           - But: is this scientifically justified?
+           - Alternative: don't include time
+           - How much does this actually change results?
+
+        2. Distance metric: Euclidean vs. Cosine?
+           - Currently: Euclidean distance
+           - Magic 8 ball uses: cosine similarity
+           - Which is better for card selection?
+           - Does the choice matter much?
+
+        3. Should draws be without replacement?
+           - Currently: can draw the same card twice
+           - Alternative: remove card after drawing
+           - Pro: More variety in spread
+           - Con: Changes semantics of "distance"
+
+        4. Should we use major arcana only?
+           - Currently: yes, 22 cards
+           - Alternative: full deck (78), or minors only (56)
+           - What spreads need what deck size?
+
+        5. Default num_cards = 10. Why?
+           - Standard tarot spread sizes: 1, 3, 10, 21
+           - Is 10 arbitrary or meaningful?
+           - Should we support common spread types?
+
+        6. The temporal context is semantic embedding.
+           - Does sentence_transformers handle time well?
+           - Alternative: separate temporal encoding + concatenation?
+           - Should time be a hard constraint (e.g., only same-hour results)?
+
+        7. Should we support minor arcana?
+           - Currently: only majors
+           - Would require a larger trained model
+           - Or: train separate predictor for minors?
+           - What does that add?
         """
         # Embed question with temporal context to 384D
         question_384d = self._embed_question_with_time(question_text)

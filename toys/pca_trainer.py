@@ -55,7 +55,27 @@ class PCATrainer:
         print(f"📦 Loaded embedding model: {model_name}")
 
     def _split_into_chunks(self, text: str, chunk_size: int = 100) -> List[str]:
-        """Split text into sentence-based chunks."""
+        """Split text into sentence-based chunks.
+
+        ❓ DESIGN QUESTIONS:
+
+        1. Should chunking be a separate class/abstraction?
+           - Pro: Testable, reusable, can swap strategies
+           - Con: Over-engineering for current use case
+           - Consider: If we want word-level or paragraph-level chunks later?
+
+        2. Is sentence-splitting on "." too naive?
+           - What about "Dr.", "U.S.", "etc."?
+           - Should we use NLTK or similar for proper sentence tokenization?
+
+        3. The chunk_size is in words. Should it be configurable?
+           - Currently hard-coded in fit(). Make it a parameter?
+           - Or learn optimal chunk size from data?
+
+        4. What's the invariant we're optimizing for?
+           - Semantic coherence? Token count? Computational efficiency?
+           - Should that constraint be explicit?
+        """
         sentences = [s.strip() for s in text.split(".") if s.strip()]
         chunks = []
         current_chunk = []
@@ -86,6 +106,38 @@ class PCATrainer:
 
         Returns:
             Path to saved PCA model
+
+        ❓ DESIGN QUESTIONS:
+
+        1. Should I/O and training be separate methods?
+           - Currently: read file → embed → fit PCA → save (all in one)
+           - Alternative: take embeddings directly, save separately
+           - Pro: More testable, composable
+           - Con: More API surface, user responsibility for I/O
+
+        2. Is file I/O the right abstraction here?
+           - What if we want to train on streaming data?
+           - Or data that comes from a database?
+           - Should we accept an iterator instead of a filepath?
+
+        3. Should we validate the explained variance?
+           - What if output_dim is too small and we lose info?
+           - Should we warn or error if explained_variance < threshold?
+
+        4. The embedder is created in __init__. Should it be injected?
+           - Current: tight coupling to sentence-transformers
+           - Alternative: depend on abstract EmbedderInterface
+           - Pro: Can swap different embedders, easier to test
+           - Con: Over-engineering?
+
+        5. Should we return just the path or also the metadata?
+           - Currently: return Path
+           - Could return: (path, explained_variance, n_chunks, ...)
+           - Does the caller need that info?
+
+        6. Error handling: what if file doesn't exist? encoding issues?
+           - Currently: silent failure (open() will raise)
+           - Should we catch and provide better error messages?
         """
         text_path = Path(text_path)
         output_path = Path(output_path)
@@ -121,14 +173,58 @@ class PCATrainer:
         return output_path
 
     def project(self, embedding: np.ndarray) -> np.ndarray:
-        """Project a 384D embedding through PCA to 24D."""
+        """Project a 384D embedding through PCA to 24D.
+
+        ❓ DESIGN QUESTIONS:
+
+        1. Should we support batch projections?
+           - Currently: takes single embedding, returns single output
+           - Common pattern: project(embeddings) → batch of outputs
+           - Pro: More efficient, vectorized
+           - Con: Different shapes to handle
+
+        2. Should we validate input shape?
+           - Currently: assume 384D input
+           - Should we check/warn if shape is wrong?
+           - What if someone passes wrong dimensionality?
+
+        3. Should reshape be implicit or explicit?
+           - Currently: reshape(1, -1) to add batch dimension
+           - Should caller be responsible for shape?
+           - Or should we accept both 1D and 2D?
+        """
         if self.pca is None:
             raise ValueError("PCA not fitted. Call fit() first.")
         return self.pca.transform(embedding.reshape(1, -1))[0]
 
     @staticmethod
     def load(pca_path: str) -> "PCATrainer":
-        """Load a saved PCA model."""
+        """Load a saved PCA model.
+
+        ❓ DESIGN QUESTIONS:
+
+        1. Should this be a @staticmethod or @classmethod?
+           - Current: @staticmethod (returns instance)
+           - Alternative: @classmethod (could set output_dim from metadata)
+           - Pro: More consistent with Python conventions
+           - Con: Need to store metadata with model
+
+        2. Should we store metadata alongside the model?
+           - Currently: just pickle the sklearn PCA object
+           - Could store: output_dim, model_name, chunk_size, etc.
+           - Pro: Self-documenting, prevent misuse
+           - Con: More complex serialization
+
+        3. Should load validate the pickle?
+           - Currently: trust pickle.load()
+           - Could check: is this actually a PCA? what version?
+           - Pro: Fail fast on corruption
+           - Con: Adds complexity
+
+        4. Error handling: what if file doesn't exist?
+           - Currently: FileNotFoundError bubbles up
+           - Should we provide better error context?
+        """
         with open(pca_path, "rb") as f:
             pca = pickle.load(f)
         trainer = PCATrainer()

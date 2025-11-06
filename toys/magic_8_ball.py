@@ -55,6 +55,39 @@ class Magic8Ball:
         Args:
             persona_name: Name of persona (must have trained models)
             models_dir: Directory containing trained PCA + Predictor models
+
+        ❓ INITIALIZATION QUESTIONS:
+
+        1. Should the embedder be configurable?
+           - Currently: hardcoded "all-MiniLM-L6-v2"
+           - Alternative: pass embedder or model_name as argument
+           - Pro: More flexible, support different embeddings
+           - Con: More API surface
+           - Does this need to match the PCA training embedding?
+
+        2. Should we cache the embedder like we cache responses?
+           - Currently: create new SentenceTransformer every time
+           - Alternative: Use a singleton or class variable
+           - Pro: Faster initialization on second Magic8Ball
+           - Con: Shared state, harder to test
+
+        3. Should we validate that PCA and predictor match?
+           - Currently: load both and hope they're compatible
+           - Alternative: check metadata (latent_dim, etc.)
+           - Pro: Fail fast on mismatch
+           - Con: Requires storing metadata with models
+
+        4. Should response embedding happen lazily or eagerly?
+           - Currently: eager (during __init__)
+           - Alternative: lazy (during first consult)
+           - Pro: Faster initialization
+           - Con: First query is slower
+
+        5. Should we support custom responses?
+           - Currently: RESPONSES are hardcoded class variable
+           - Alternative: pass responses_list to __init__
+           - Pro: More flexible, persona-specific responses
+           - Con: More complex initialization
         """
         self.persona_name = persona_name
         self.models_dir = Path(models_dir)
@@ -92,6 +125,46 @@ class Magic8Ball:
 
         Returns:
             Dict with response, similarity, alternatives, persona
+
+        ❓ INFERENCE QUESTIONS:
+
+        1. The pipeline: embed → PCA project → predictor → match
+           - Is this the right order?
+           - Could we skip the predictor and just match question directly?
+           - Pro: Simpler, fewer moving parts
+           - Con: Loses persona-specific "next-step" information
+
+        2. Should we scale the predictor output?
+           - Currently: use as-is
+           - Alternative: normalize to unit norm before matching
+           - Does this change the rankings?
+
+        3. Cosine similarity has a 1e-8 epsilon. Why?
+           - To prevent division by zero?
+           - Should we use torch.nn.functional.cosine_similarity instead?
+           - Pro: More numerically stable
+           - Con: Different implementation, different results
+
+        4. Should we return confidence scores?
+           - Currently: similarity is [0..1] range
+           - Alternative: convert to probability (softmax)?
+           - Alternative: confidence = (max - second_max) / max?
+           - Pro: More informative about decision confidence
+
+        5. How many alternatives should we return?
+           - Currently: hardcoded top 3
+           - Should this be configurable?
+           - Should we only return if gap is small?
+
+        6. Should we cache the predicted response?
+           - Currently: compute fresh each time
+           - For same question asked twice: redundant computation?
+           - Con: Memory overhead, invalidation issues
+
+        7. Should question preprocessing happen?
+           - Currently: raw text
+           - Alternative: lowercase, remove punctuation, normalize
+           - Does normalization help or hurt persona-specific encoding?
         """
         # Embed question to 384D
         question_384d = self.embedder.encode([question_text], convert_to_numpy=True)[0]
