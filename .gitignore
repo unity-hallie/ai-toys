@@ -1,22 +1,59 @@
-// Generated data and models - do not check in
+# Generated data and models - do not check in
 data/
 toys_models/
 
-// Python
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+*.so
 *.egg-info/
 dist/
 build/
 
-// Environment
+# Virtual environments
 .venv/
 venv/
 env/
+ENV/
 
-// IDE
+# IDE and editors
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.DS_Store
+
+# Python environments
+.env
+.env.local
+.env.*.local
+
+# PyTorch/ML models and checkpoints
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+weights/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Weights & Biases
+.wandb/
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+logs/
