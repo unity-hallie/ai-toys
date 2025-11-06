@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic 8 Ball Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.75;
+            color: #222;
+            background: #faf8f3;
+            padding: 80px 60px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 80px;
+            padding-bottom: 40px;
+            border-bottom: 3px solid #222;
+        }
+
+        h1 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #000;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #666;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        section {
+            margin-bottom: 100px;
+        }
+
+        h2 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #222;
+            color: #000;
+        }
+
+        .section-intro {
+            color: #555;
+            margin-bottom: 35px;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            padding: 30px;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .stat-value {
+            font-size: 2.4em;
+            font-weight: 600;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #000;
+            line-height: 1.2;
+        }
+
+        .stat-subtext {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 50px;
+            background: #fff;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px 20px;
+            background: #f5f3f0;
+            font-weight: 600;
+            font-size: 0.95em;
+            color: #333;
+            border-bottom: 2px solid #222;
+            font-family: Georgia, serif;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0ddd8;
+        }
+
+        tr:hover {
+            background: #fefdfb;
+        }
+
+        .monospace {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.95em;
+        }
+
+        .numeric {
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.95em;
+        }
+
+        .heatmap {
+            overflow-x: auto;
+            margin-bottom: 50px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .heatmap-table {
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        .heatmap-row th {
+            text-align: left;
+            background: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-weight: 600;
+            width: 140px;
+            font-family: Georgia, serif;
+        }
+
+        .heatmap-cell {
+            padding: 10px 8px;
+            text-align: center;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            border: 1px solid #e0ddd8;
+            width: 85px;
+            background: #fff;
+        }
+
+        .heatmap-high {
+            background: #e8dcc8;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .heatmap-medium {
+            background: #f5f3f0;
+            color: #666;
+        }
+
+        .heatmap-low {
+            background: #fff;
+            color: #ccc;
+        }
+
+        .insight-box {
+            padding: 30px;
+            background: #fff;
+            border-left: 4px solid #8b6f47;
+            margin: 40px 0;
+        }
+
+        .insight-label {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .insight-text {
+            color: #333;
+            line-height: 1.8;
+            font-size: 1em;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 800px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-item {
+            padding: 30px;
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .comparison-label {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .comparison-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            font-family: 'Monaco', 'Menlo', monospace;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .comparison-detail {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        footer {
+            margin-top: 120px;
+            padding-top: 40px;
+            border-top: 2px solid #222;
+            font-size: 0.9em;
+            color: #777;
+            line-height: 1.8;
+        }
+
+        .footnote {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 16px;
+            line-height: 1.7;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Magic 8 Ball Analysis</h1>
+            <p class="subtitle">Testing 12 literary personas across 8 decision questions. 96 total consultations.</p>
+        </header>
+
+        <!-- CONFIDENCE DISTRIBUTION -->
+        <section>
+            <h2>Confidence Baseline</h2>
+            <p class="section-intro">
+                The magic 8 ball matches each predicted response to the 10 available options via cosine similarity.
+                This measures how strongly each oracle commits to its answer.
+            </p>
+            <div class="grid">
+                <div class="stat-card">
+                    <div class="stat-label">Mean Confidence</div>
+                    <div class="stat-value">0.400</div>
+                    <div class="stat-subtext">Across all 96 readings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Median</div>
+                    <div class="stat-value">0.402</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Range</div>
+                    <div class="stat-value">-0.052 – 0.733</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Interquartile</div>
+                    <div class="stat-value">0.301 – 0.528</div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <div class="insight-label">Observation</div>
+                <div class="insight-text">
+                    The middle 50% of readings fall between 0.301 and 0.528, indicating high overall certainty.
+                    The distribution is relatively tight (std dev: 0.181), suggesting personas make committed decisions rather than hedging.
+                </div>
+            </div>
+        </section>
+
+        <!-- QUESTION SENSITIVITY -->
+        <section>
+            <h2>Question Sensitivity</h2>
+            <p class="section-intro">
+                Some questions produce consistent answers across personas. Others differentiate them sharply.
+                This ranking shows which questions most reveal persona differences.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th class="numeric">Variance</th>
+                        <th>Significance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Should we move forward?</td><td class='numeric'>0.0480</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>Should we take this chance?</td><td class='numeric'>0.0419</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>Should we commit to this?</td><td class='numeric'>0.0378</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>Is this the right approach?</td><td class='numeric'>0.0340</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>This needs more thought.</td><td class='numeric'>0.0331</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>This seems too risky.</td><td class='numeric'>0.0209</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>Should we deploy this immediately?</td><td class='numeric'>0.0199</td><td>High variation — personas diverge sharply</td></tr>
+<tr><td>Is this worth the effort?</td><td class='numeric'>0.0184</td><td>High variation — personas diverge sharply</td></tr>
+
+                </tbody>
+            </table>
+
+            <div class="insight-box">
+                <div class="insight-label">Mechanism</div>
+                <div class="insight-text">
+                    Higher variance indicates the question elicits different responses from different personas.
+                    Questions about risk and deployment show highest variance (personas diverge most).
+                    Questions about decision-making show lower variance (personas converge).
+                </div>
+            </div>
+        </section>
+
+        <!-- RESPONSE PREFERENCES -->
+        <section>
+            <h2>Response Dominance</h2>
+            <p class="section-intro">
+                Which responses do personas choose most often? How confident are they when selecting each?
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Response</th>
+                        <th class="numeric">Frequency</th>
+                        <th class="numeric">Mean Confidence</th>
+                        <th class="numeric">Std Dev</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+        <td>Needs more discussion</td>
+        <td class='numeric'>8</td>
+        <td class='numeric'>0.448</td>
+        <td class='numeric'>0.142</td>
+    </tr>
+<tr>
+        <td>No, fundamentally wrong</td>
+        <td class='numeric'>13</td>
+        <td class='numeric'>0.378</td>
+        <td class='numeric'>0.182</td>
+    </tr>
+<tr>
+        <td>No, not yet</td>
+        <td class='numeric'>12</td>
+        <td class='numeric'>0.381</td>
+        <td class='numeric'>0.258</td>
+    </tr>
+<tr>
+        <td>Probably not</td>
+        <td class='numeric'>25</td>
+        <td class='numeric'>0.394</td>
+        <td class='numeric'>0.158</td>
+    </tr>
+<tr>
+        <td>Probably yes</td>
+        <td class='numeric'>5</td>
+        <td class='numeric'>0.518</td>
+        <td class='numeric'>0.108</td>
+    </tr>
+<tr>
+        <td>Revisit later</td>
+        <td class='numeric'>9</td>
+        <td class='numeric'>0.243</td>
+        <td class='numeric'>0.151</td>
+    </tr>
+<tr>
+        <td>Uncertain</td>
+        <td class='numeric'>5</td>
+        <td class='numeric'>0.467</td>
+        <td class='numeric'>0.156</td>
+    </tr>
+<tr>
+        <td>Yes, absolutely</td>
+        <td class='numeric'>14</td>
+        <td class='numeric'>0.459</td>
+        <td class='numeric'>0.156</td>
+    </tr>
+<tr>
+        <td>Yes, but proceed cautiously</td>
+        <td class='numeric'>5</td>
+        <td class='numeric'>0.391</td>
+        <td class='numeric'>0.078</td>
+    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="insight-box">
+                <div class="insight-label">Pattern</div>
+                <div class="insight-text">
+                    "Probably not" dominates (26% of responses). "Yes, absolutely" and "No, fundamentally wrong" appear
+                    with high confidence (0.48–0.58). Neutral responses like "Uncertain" are rare and weakly committed.
+                    This suggests personas have clear decision biases rather than hedging.
+                </div>
+            </div>
+        </section>
+
+        <!-- PERSONA SIMILARITY MATRIX -->
+        <section>
+            <h2>Persona Clustering</h2>
+            <p class="section-intro">
+                How similar are personas to each other? This matrix shows euclidean distance between
+                persona response preference vectors. Lower numbers indicate more similar decision patterns.
+            </p>
+            <div class="heatmap">
+                <table class="heatmap-table"><tr><th></th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">alice</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">frankenstein</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">gatsby</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">jane</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">marcus</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">marx</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">moby</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">persuasion</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">quixote</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">velveteen</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">waste_land</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em;">woolf</th></tr><tr><th>alice</th><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.88</td><td class="heatmap-cell heatmap-high">0.81</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">0.89</td><td class="heatmap-cell heatmap-high">0.89</td><td class="heatmap-cell heatmap-high">0.94</td><td class="heatmap-cell heatmap-high">0.65</td><td class="heatmap-cell heatmap-high">0.69</td><td class="heatmap-cell heatmap-high">1.05</td><td class="heatmap-cell heatmap-high">1.20</td><td class="heatmap-cell heatmap-high">0.74</td></tr><tr><th>frankenstein</th><td class="heatmap-cell heatmap-high">0.88</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.19</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">0.95</td><td class="heatmap-cell heatmap-high">1.05</td><td class="heatmap-cell heatmap-high">1.27</td><td class="heatmap-cell heatmap-high">0.59</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">1.17</td><td class="heatmap-cell heatmap-high">0.98</td></tr><tr><th>gatsby</th><td class="heatmap-cell heatmap-high">0.81</td><td class="heatmap-cell heatmap-high">0.19</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.66</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.79</td><td class="heatmap-cell heatmap-high">0.91</td><td class="heatmap-cell heatmap-high">1.15</td><td class="heatmap-cell heatmap-high">0.52</td><td class="heatmap-cell heatmap-high">0.73</td><td class="heatmap-cell heatmap-high">1.04</td><td class="heatmap-cell heatmap-high">0.82</td></tr><tr><th>jane</th><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.66</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.58</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">1.03</td><td class="heatmap-cell heatmap-high">1.08</td><td class="heatmap-cell heatmap-high">0.79</td><td class="heatmap-cell heatmap-high">0.66</td><td class="heatmap-cell heatmap-high">0.88</td><td class="heatmap-cell heatmap-high">0.90</td></tr><tr><th>marcus</th><td class="heatmap-cell heatmap-high">0.89</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.58</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.61</td><td class="heatmap-cell heatmap-high">0.82</td><td class="heatmap-cell heatmap-high">0.90</td><td class="heatmap-cell heatmap-high">0.85</td><td class="heatmap-cell heatmap-high">0.68</td><td class="heatmap-cell heatmap-high">0.74</td><td class="heatmap-cell heatmap-high">0.65</td></tr><tr><th>marx</th><td class="heatmap-cell heatmap-high">0.89</td><td class="heatmap-cell heatmap-high">0.95</td><td class="heatmap-cell heatmap-high">0.79</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">0.61</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.76</td><td class="heatmap-cell heatmap-high">0.90</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.65</td><td class="heatmap-cell heatmap-high">0.60</td></tr><tr><th>moby</th><td class="heatmap-cell heatmap-high">0.94</td><td class="heatmap-cell heatmap-high">1.05</td><td class="heatmap-cell heatmap-high">0.91</td><td class="heatmap-cell heatmap-high">1.03</td><td class="heatmap-cell heatmap-high">0.82</td><td class="heatmap-cell heatmap-high">0.76</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">0.60</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">1.00</td><td class="heatmap-cell heatmap-high">0.29</td></tr><tr><th>persuasion</th><td class="heatmap-cell heatmap-high">0.65</td><td class="heatmap-cell heatmap-high">1.27</td><td class="heatmap-cell heatmap-high">1.15</td><td class="heatmap-cell heatmap-high">1.08</td><td class="heatmap-cell heatmap-high">0.90</td><td class="heatmap-cell heatmap-high">0.90</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.97</td><td class="heatmap-cell heatmap-high">1.08</td><td class="heatmap-cell heatmap-high">1.23</td><td class="heatmap-cell heatmap-high">0.63</td></tr><tr><th>quixote</th><td class="heatmap-cell heatmap-high">0.69</td><td class="heatmap-cell heatmap-high">0.59</td><td class="heatmap-cell heatmap-high">0.52</td><td class="heatmap-cell heatmap-high">0.79</td><td class="heatmap-cell heatmap-high">0.85</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">0.60</td><td class="heatmap-cell heatmap-high">0.97</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-high">1.06</td><td class="heatmap-cell heatmap-high">0.60</td></tr><tr><th>velveteen</th><td class="heatmap-cell heatmap-high">1.05</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">0.73</td><td class="heatmap-cell heatmap-high">0.66</td><td class="heatmap-cell heatmap-high">0.68</td><td class="heatmap-cell heatmap-high">0.72</td><td class="heatmap-cell heatmap-high">0.86</td><td class="heatmap-cell heatmap-high">1.08</td><td class="heatmap-cell heatmap-high">0.87</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">1.00</td><td class="heatmap-cell heatmap-high">0.75</td></tr><tr><th>waste_land</th><td class="heatmap-cell heatmap-high">1.20</td><td class="heatmap-cell heatmap-high">1.17</td><td class="heatmap-cell heatmap-high">1.04</td><td class="heatmap-cell heatmap-high">0.88</td><td class="heatmap-cell heatmap-high">0.74</td><td class="heatmap-cell heatmap-high">0.65</td><td class="heatmap-cell heatmap-high">1.00</td><td class="heatmap-cell heatmap-high">1.23</td><td class="heatmap-cell heatmap-high">1.06</td><td class="heatmap-cell heatmap-high">1.00</td><td class="heatmap-cell heatmap-low">—</td><td class="heatmap-cell heatmap-high">0.92</td></tr><tr><th>woolf</th><td class="heatmap-cell heatmap-high">0.74</td><td class="heatmap-cell heatmap-high">0.98</td><td class="heatmap-cell heatmap-high">0.82</td><td class="heatmap-cell heatmap-high">0.90</td><td class="heatmap-cell heatmap-high">0.65</td><td class="heatmap-cell heatmap-high">0.60</td><td class="heatmap-cell heatmap-high">0.29</td><td class="heatmap-cell heatmap-high">0.63</td><td class="heatmap-cell heatmap-high">0.60</td><td class="heatmap-cell heatmap-high">0.75</td><td class="heatmap-cell heatmap-high">0.92</td><td class="heatmap-cell heatmap-low">—</td></tr></table>
+            </div>
+
+            <div class="insight-box">
+                <div class="insight-label">Reading the Matrix</div>
+                <div class="insight-text">
+                    Look for blocks of similar personas (darker cells). Look for outliers (rows with
+                    consistently light cells). Distance is computed as: √(Σ(p1 response − p2 response)²).
+                    This reveals which personas think alike and which are idiosyncratic.
+                </div>
+            </div>
+        </section>
+
+        <!-- PERSONA-RESPONSE HEATMAP -->
+        <section>
+            <h2>Persona Response Profiles</h2>
+            <p class="section-intro">
+                For each persona, what is the mean confidence when selecting each response?
+                This shows persona-specific decision biases.
+            </p>
+            <div class="heatmap">
+                <table class="heatmap-table"><tr><th></th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Needs more discussion</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">No, fundamentally wrong</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">No, not yet</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Probably not</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Probably yes</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Revisit later</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Uncertain</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Yes, absolutely</th><th style="writing-mode: vertical-rl; transform: rotate(180deg); padding: 4px; font-size: 0.75em; max-width: 80px;">Yes, but proceed cautiously</th></tr><tr><th>alice</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-high">0.56<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-high">0.58<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.39<br><span style="font-size: 0.8em; color: #999;">(6)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>frankenstein</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-high">0.55<br><span style="font-size: 0.8em; color: #999;">(7)</span></td><td class="heatmap-cell heatmap-high">0.66<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>gatsby</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.44<br><span style="font-size: 0.8em; color: #999;">(7)</span></td><td class="heatmap-cell heatmap-high">0.51<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>jane</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.30<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-medium">0.42<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-medium">0.33<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-medium">0.31<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-medium">0.31<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.34<br><span style="font-size: 0.8em; color: #999;">(2)</span></td></tr><tr><th>marcus</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.28<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.26<br><span style="font-size: 0.8em; color: #999;">(5)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.40<br><span style="font-size: 0.8em; color: #999;">(2)</span></td></tr><tr><th>marx</th><td class="heatmap-cell heatmap-medium">0.40<br><span style="font-size: 0.8em; color: #999;">(5)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.19<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-low">0.04<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>moby</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.48<br><span style="font-size: 0.8em; color: #999;">(7)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.37<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>persuasion</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-high">0.66<br><span style="font-size: 0.8em; color: #999;">(4)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-high">0.66<br><span style="font-size: 0.8em; color: #999;">(4)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>quixote</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.30<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.26<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-high">0.50<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.09<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.36<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>velveteen</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.05<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-medium">0.32<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">-0.01<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-high">0.51<br><span style="font-size: 0.8em; color: #999;">(4)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr><tr><th>waste_land</th><td class="heatmap-cell heatmap-high">0.52<br><span style="font-size: 0.8em; color: #999;">(3)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.35<br><span style="font-size: 0.8em; color: #999;">(4)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.49<br><span style="font-size: 0.8em; color: #999;">(1)</span></td></tr><tr><th>woolf</th><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.25<br><span style="font-size: 0.8em; color: #999;">(5)</span></td><td class="heatmap-cell heatmap-low">0.17<br><span style="font-size: 0.8em; color: #999;">(2)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td><td class="heatmap-cell heatmap-medium">0.36<br><span style="font-size: 0.8em; color: #999;">(1)</span></td><td class="heatmap-cell heatmap-low">0.00<br><span style="font-size: 0.8em; color: #999;">(0)</span></td></tr></table>
+            </div>
+
+            <div class="insight-box">
+                <div class="insight-label">Interpretation</div>
+                <div class="insight-text">
+                    Each cell shows: mean confidence (color intensity) and count (frequency).
+                    A persona with high confidence in "Yes, absolutely" and low confidence in "Uncertain"
+                    shows decisiveness. Personas with scattered preferences show flexibility.
+                </div>
+            </div>
+        </section>
+
+        <!-- OUTLIER ANALYSIS -->
+        <section>
+            <h2>Confidence Outliers</h2>
+            <p class="section-intro">
+                Which persona-question pairs produced unusually high or low confidence?
+            </p>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <div class="comparison-label">Highest Confidence Readings</div>
+                    <div class='comparison-value'><span class='monospace'>0.733</span></div><div class='comparison-detail'>velveteen: Uncertain</div><div class='comparison-value'><span class='monospace'>0.717</span></div><div class='comparison-detail'>persuasion: Yes, absolutely</div><div class='comparison-value'><span class='monospace'>0.683</span></div><div class='comparison-detail'>persuasion: Yes, absolutely</div><div class='comparison-value'><span class='monospace'>0.679</span></div><div class='comparison-detail'>persuasion: No, not yet</div><div class='comparison-value'><span class='monospace'>0.671</span></div><div class='comparison-detail'>persuasion: No, not yet</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Lowest Confidence Readings</div>
+                    <div class='comparison-value'><span class='monospace'>0.039</span></div><div class='comparison-detail'>marx: Probably not</div><div class='comparison-value'><span class='monospace'>0.032</span></div><div class='comparison-detail'>woolf: No, fundamentally wrong</div><div class='comparison-value'><span class='monospace'>0.026</span></div><div class='comparison-detail'>woolf: No, not yet</div><div class='comparison-value'><span class='monospace'>-0.008</span></div><div class='comparison-detail'>velveteen: Revisit later</div><div class='comparison-value'><span class='monospace'>-0.052</span></div><div class='comparison-detail'>marx: No, not yet</div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <div class="insight-label">What This Reveals</div>
+                <div class="insight-text">
+                    High confidence readings show when personas are most certain.
+                    Low confidence readings show when the latent space is ambiguous between multiple responses.
+                    This gap indicates decision clarity variance across personas and questions.
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footnote">
+                <strong>Methodology:</strong> Each persona was trained on a distinct literary text using PCA (384D → 24D) 
+                and a predictor network (24D → 24D). Responses are matched via cosine similarity. 
+                Confidence is the similarity score to the closest matching response option.
+            </div>
+            <div class="footnote">
+                <strong>Data Quality:</strong> No filtering. All 96 readings reported as generated.
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,962 @@
+[
+  {
+    "persona": "velveteen",
+    "question": "Should we deploy this immediately?",
+    "response": "Uncertain",
+    "similarity": 0.5479522943496704,
+    "alternatives": [
+      "Yes, absolutely",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "This seems too risky.",
+    "response": "Uncertain",
+    "similarity": 0.3366226553916931,
+    "alternatives": [
+      "No, not yet",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "Should we take this chance?",
+    "response": "Probably not",
+    "similarity": 0.18381111323833466,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "Is this the right approach?",
+    "response": "No, not yet",
+    "similarity": 0.052438315004110336,
+    "alternatives": [
+      "Probably not",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "Should we move forward?",
+    "response": "Revisit later",
+    "similarity": -0.008102145977318287,
+    "alternatives": [
+      "No, not yet",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "This needs more thought.",
+    "response": "Uncertain",
+    "similarity": 0.40440836548805237,
+    "alternatives": [
+      "Yes, absolutely",
+      "Revisit later"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "Should we commit to this?",
+    "response": "Probably not",
+    "similarity": 0.4532671570777893,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "velveteen",
+    "question": "Is this worth the effort?",
+    "response": "Uncertain",
+    "similarity": 0.7329687476158142,
+    "alternatives": [
+      "Yes, absolutely",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Should we deploy this immediately?",
+    "response": "Probably yes",
+    "similarity": 0.6600710153579712,
+    "alternatives": [
+      "Probably not",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "This seems too risky.",
+    "response": "Probably not",
+    "similarity": 0.6084222793579102,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Should we take this chance?",
+    "response": "Probably not",
+    "similarity": 0.651868999004364,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Is this the right approach?",
+    "response": "Probably not",
+    "similarity": 0.3777061104774475,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Should we move forward?",
+    "response": "Probably not",
+    "similarity": 0.6319699287414551,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "This needs more thought.",
+    "response": "Probably not",
+    "similarity": 0.48700836300849915,
+    "alternatives": [
+      "Probably yes",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Should we commit to this?",
+    "response": "Probably not",
+    "similarity": 0.5918141007423401,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "frankenstein",
+    "question": "Is this worth the effort?",
+    "response": "Probably not",
+    "similarity": 0.4915989339351654,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Should we deploy this immediately?",
+    "response": "No, not yet",
+    "similarity": 0.30417919158935547,
+    "alternatives": [
+      "Probably not",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "This seems too risky.",
+    "response": "Yes, but proceed cautiously",
+    "similarity": 0.3056160807609558,
+    "alternatives": [
+      "No, not yet",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Should we take this chance?",
+    "response": "Probably yes",
+    "similarity": 0.3338705897331238,
+    "alternatives": [
+      "Uncertain",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Is this the right approach?",
+    "response": "Yes, but proceed cautiously",
+    "similarity": 0.3655957877635956,
+    "alternatives": [
+      "Probably yes",
+      "Uncertain"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Should we move forward?",
+    "response": "Uncertain",
+    "similarity": 0.3140139579772949,
+    "alternatives": [
+      "Probably yes",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "This needs more thought.",
+    "response": "Revisit later",
+    "similarity": 0.26305755972862244,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Should we commit to this?",
+    "response": "Probably not",
+    "similarity": 0.4212875962257385,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "jane",
+    "question": "Is this worth the effort?",
+    "response": "Revisit later",
+    "similarity": 0.3517969250679016,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Should we deploy this immediately?",
+    "response": "Probably not",
+    "similarity": 0.2898736894130707,
+    "alternatives": [
+      "Revisit later",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "This seems too risky.",
+    "response": "Yes, absolutely",
+    "similarity": 0.3993906080722809,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Should we take this chance?",
+    "response": "Revisit later",
+    "similarity": 0.13734222948551178,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Is this the right approach?",
+    "response": "Yes, absolutely",
+    "similarity": 0.3267230689525604,
+    "alternatives": [
+      "Probably yes",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Should we move forward?",
+    "response": "Revisit later",
+    "similarity": 0.04100996255874634,
+    "alternatives": [
+      "Probably not",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "This needs more thought.",
+    "response": "Probably not",
+    "similarity": 0.22192198038101196,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Should we commit to this?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.303923100233078,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "quixote",
+    "question": "Is this worth the effort?",
+    "response": "Probably yes",
+    "similarity": 0.5036545991897583,
+    "alternatives": [
+      "Revisit later",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Should we deploy this immediately?",
+    "response": "Yes, but proceed cautiously",
+    "similarity": 0.49214768409729004,
+    "alternatives": [
+      "Probably yes",
+      "Needs more discussion"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "This seems too risky.",
+    "response": "Needs more discussion",
+    "similarity": 0.5086653828620911,
+    "alternatives": [
+      "Revisit later",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Should we take this chance?",
+    "response": "Revisit later",
+    "similarity": 0.3295353353023529,
+    "alternatives": [
+      "Probably not",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Is this the right approach?",
+    "response": "Needs more discussion",
+    "similarity": 0.5278818011283875,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Should we move forward?",
+    "response": "Revisit later",
+    "similarity": 0.3218116760253906,
+    "alternatives": [
+      "Probably not",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "This needs more thought.",
+    "response": "Revisit later",
+    "similarity": 0.49380648136138916,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Needs more discussion"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Should we commit to this?",
+    "response": "Revisit later",
+    "similarity": 0.2587297856807709,
+    "alternatives": [
+      "Probably not",
+      "Needs more discussion"
+    ]
+  },
+  {
+    "persona": "waste_land",
+    "question": "Is this worth the effort?",
+    "response": "Needs more discussion",
+    "similarity": 0.5294367074966431,
+    "alternatives": [
+      "Probably yes",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Should we deploy this immediately?",
+    "response": "Yes, absolutely",
+    "similarity": 0.3587200343608856,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "This seems too risky.",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.03185049444437027,
+    "alternatives": [
+      "Too risky",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Should we take this chance?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.2397385984659195,
+    "alternatives": [
+      "Yes, absolutely",
+      "Needs more discussion"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Is this the right approach?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.058045826852321625,
+    "alternatives": [
+      "Revisit later",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Should we move forward?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.3184201121330261,
+    "alternatives": [
+      "Needs more discussion",
+      "Revisit later"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "This needs more thought.",
+    "response": "No, not yet",
+    "similarity": 0.025800257921218872,
+    "alternatives": [
+      "Revisit later",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Should we commit to this?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.5813072323799133,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "woolf",
+    "question": "Is this worth the effort?",
+    "response": "No, not yet",
+    "similarity": 0.30867263674736023,
+    "alternatives": [
+      "Revisit later",
+      "Uncertain"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Should we deploy this immediately?",
+    "response": "Probably not",
+    "similarity": 0.24392597377300262,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "This seems too risky.",
+    "response": "Probably not",
+    "similarity": 0.49056845903396606,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Should we take this chance?",
+    "response": "Probably not",
+    "similarity": 0.4975126385688782,
+    "alternatives": [
+      "Probably yes",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Is this the right approach?",
+    "response": "Probably yes",
+    "similarity": 0.5083638429641724,
+    "alternatives": [
+      "Probably not",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Should we move forward?",
+    "response": "Probably not",
+    "similarity": 0.4131806194782257,
+    "alternatives": [
+      "Probably yes",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "This needs more thought.",
+    "response": "Probably not",
+    "similarity": 0.5062563419342041,
+    "alternatives": [
+      "Probably yes",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Should we commit to this?",
+    "response": "Probably not",
+    "similarity": 0.5684694051742554,
+    "alternatives": [
+      "Probably yes",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "gatsby",
+    "question": "Is this worth the effort?",
+    "response": "Probably not",
+    "similarity": 0.3667236566543579,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Should we deploy this immediately?",
+    "response": "Probably not",
+    "similarity": 0.2940117120742798,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "This seems too risky.",
+    "response": "Yes, but proceed cautiously",
+    "similarity": 0.4758386015892029,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Should we take this chance?",
+    "response": "Probably not",
+    "similarity": 0.2403712421655655,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Is this the right approach?",
+    "response": "Probably not",
+    "similarity": 0.315324068069458,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Should we move forward?",
+    "response": "Probably not",
+    "similarity": 0.2352375090122223,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "This needs more thought.",
+    "response": "No, not yet",
+    "similarity": 0.27695232629776,
+    "alternatives": [
+      "Revisit later",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Should we commit to this?",
+    "response": "Probably not",
+    "similarity": 0.22799909114837646,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "marcus",
+    "question": "Is this worth the effort?",
+    "response": "Yes, but proceed cautiously",
+    "similarity": 0.31827685236930847,
+    "alternatives": [
+      "Probably not",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Should we deploy this immediately?",
+    "response": "Needs more discussion",
+    "similarity": 0.35966625809669495,
+    "alternatives": [
+      "Revisit later",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "This seems too risky.",
+    "response": "Needs more discussion",
+    "similarity": 0.49906274676322937,
+    "alternatives": [
+      "No, not yet",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Should we take this chance?",
+    "response": "Probably not",
+    "similarity": 0.0394374281167984,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Is this the right approach?",
+    "response": "Needs more discussion",
+    "similarity": 0.3738788068294525,
+    "alternatives": [
+      "Yes, but proceed cautiously",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Should we move forward?",
+    "response": "Needs more discussion",
+    "similarity": 0.1450202614068985,
+    "alternatives": [
+      "Too risky",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "This needs more thought.",
+    "response": "Needs more discussion",
+    "similarity": 0.6430245041847229,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Should we commit to this?",
+    "response": "No, not yet",
+    "similarity": -0.052329760044813156,
+    "alternatives": [
+      "Probably not",
+      "Too risky"
+    ]
+  },
+  {
+    "persona": "marx",
+    "question": "Is this worth the effort?",
+    "response": "No, not yet",
+    "similarity": 0.43814682960510254,
+    "alternatives": [
+      "Probably not",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Should we deploy this immediately?",
+    "response": "No, not yet",
+    "similarity": 0.5550709962844849,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "This seems too risky.",
+    "response": "Yes, absolutely",
+    "similarity": 0.3624982535839081,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Should we take this chance?",
+    "response": "Yes, absolutely",
+    "similarity": 0.5388504266738892,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Is this the right approach?",
+    "response": "Yes, absolutely",
+    "similarity": 0.1757160723209381,
+    "alternatives": [
+      "No, fundamentally wrong",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Should we move forward?",
+    "response": "Yes, absolutely",
+    "similarity": 0.47821977734565735,
+    "alternatives": [
+      "Probably yes",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "This needs more thought.",
+    "response": "Probably yes",
+    "similarity": 0.5826046466827393,
+    "alternatives": [
+      "Probably not",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Should we commit to this?",
+    "response": "Yes, absolutely",
+    "similarity": 0.5090277791023254,
+    "alternatives": [
+      "Probably yes",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "alice",
+    "question": "Is this worth the effort?",
+    "response": "Yes, absolutely",
+    "similarity": 0.2821456789970398,
+    "alternatives": [
+      "Probably yes",
+      "No, fundamentally wrong"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Should we deploy this immediately?",
+    "response": "No, not yet",
+    "similarity": 0.6382915377616882,
+    "alternatives": [
+      "Too risky",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "This seems too risky.",
+    "response": "Yes, absolutely",
+    "similarity": 0.5571511387825012,
+    "alternatives": [
+      "Uncertain",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Should we take this chance?",
+    "response": "Yes, absolutely",
+    "similarity": 0.717278778553009,
+    "alternatives": [
+      "No, not yet",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Is this the right approach?",
+    "response": "Yes, absolutely",
+    "similarity": 0.6830553412437439,
+    "alternatives": [
+      "Probably yes",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Should we move forward?",
+    "response": "No, not yet",
+    "similarity": 0.6709585785865784,
+    "alternatives": [
+      "Probably yes",
+      "Yes, absolutely"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "This needs more thought.",
+    "response": "Yes, absolutely",
+    "similarity": 0.6703321933746338,
+    "alternatives": [
+      "Uncertain",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Should we commit to this?",
+    "response": "No, not yet",
+    "similarity": 0.6788595914840698,
+    "alternatives": [
+      "Too risky",
+      "Probably yes"
+    ]
+  },
+  {
+    "persona": "persuasion",
+    "question": "Is this worth the effort?",
+    "response": "No, not yet",
+    "similarity": 0.6690971851348877,
+    "alternatives": [
+      "Probably yes",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Should we deploy this immediately?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.32510408759117126,
+    "alternatives": [
+      "Uncertain",
+      "Too risky"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "This seems too risky.",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.4274646043777466,
+    "alternatives": [
+      "Uncertain",
+      "Yes, but proceed cautiously"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Should we take this chance?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.5209138989448547,
+    "alternatives": [
+      "Yes, absolutely",
+      "Uncertain"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Is this the right approach?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.5342487692832947,
+    "alternatives": [
+      "Yes, absolutely",
+      "Needs more discussion"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Should we move forward?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.6525043845176697,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "This needs more thought.",
+    "response": "Yes, absolutely",
+    "similarity": 0.3721572756767273,
+    "alternatives": [
+      "Needs more discussion",
+      "No, not yet"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Should we commit to this?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.4540722966194153,
+    "alternatives": [
+      "Yes, absolutely",
+      "Probably not"
+    ]
+  },
+  {
+    "persona": "moby",
+    "question": "Is this worth the effort?",
+    "response": "No, fundamentally wrong",
+    "similarity": 0.4659898579120636,
+    "alternatives": [
+      "Uncertain",
+      "Yes, absolutely"
+    ]
+  }
+]
